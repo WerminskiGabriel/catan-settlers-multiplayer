@@ -1,6 +1,6 @@
 package pl.GabrielW.catan_server.gameEngine;
 
-public enum Card {
+public enum CardType {
     Wood,
     Wheat,
     Ore,
