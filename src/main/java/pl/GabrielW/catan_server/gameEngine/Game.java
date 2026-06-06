@@ -12,6 +12,7 @@ public class Game {
     private HashMap< String, Player > players;
     private PlayerFactory playerFactory;
     private int turnNumber;
+    private TurnPhase turnPhase;
     private RollingDicesFactory rollingDicesFactory;
 
     public Game() {
@@ -20,6 +21,7 @@ public class Game {
         this.playerFactory = new PlayerFactory();
         this.turnNumber = 0;
         this.rollingDicesFactory = new RollingDicesFactory();
+        this.turnPhase = TurnPhase.FIRST_2_TURNS;
     }
 
     public void addPlayer( String nickName ) {
@@ -30,28 +32,32 @@ public class Game {
         players.put( nickName , player );
     }
 
-    public void nextTurn() {
-        if( turnNumber < 2 ) {
+    public void nextTurn( Player currentPlayer) {
 
-        } else {
-            this.rollingDicesFactory.roll();
-            int diceSum = rollingDicesFactory.getSum();
-            List< Coordinate > coordinates = board.tokenToCoordinates( diceSum );
+        switch( this.turnPhase ) {
+            case TurnPhase.FIRST_2_TURNS -> { }
+            case TurnPhase.ROLL_PHASE -> {
 
-            for( Coordinate coordinate : coordinates ) {
-                CardType cardType = board.coordinateToCardType( coordinate );
-                List<Building> buildings =  board.coordinateToBuildings( coordinate );
-
-                for( Building building : buildings ) {
-                    Player player = building.getPlayer();
-
-                    player.addCard( cardType );
+                this.rollingDicesFactory.roll();
+                int diceSum = rollingDicesFactory.getSum();
+                List< Coordinate > coordinates = board.tokenToCoordinates( diceSum );
+                for( Coordinate coordinate : coordinates ) {
+                    CardType cardType = board.coordinateToCardType( coordinate );
+                    List< Building > buildings = board.coordinateToBuildings( coordinate );
+                    for( Building building : buildings ) {
+                        Player player = building.getPlayer();
+                        player.addCard( cardType );
+                    }
                 }
-            }
 
+            }
+            case TurnPhase.TRADE_AND_BUILD -> { }
+            case TurnPhase.DISCARD_PHASE -> { }
+            case TurnPhase.ROBBER_PLACEMENT -> { }
+            case TurnPhase.STEAL_PHASE -> { }
+            case TurnPhase.GAME_OVER -> { }
 
         }
 
-        this.turnNumber += 1;
     }
 }

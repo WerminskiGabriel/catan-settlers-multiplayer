@@ -40,7 +40,10 @@ public class Player {
 
     public void addCard( CardType cardType ) {
         this.cards.compute( cardType , ( k , v ) -> ( v == null ) ? 1 : v + 1 );
+    }
 
+    public void removeCard( CardType cardType ) {
+        this.cards.compute( cardType , ( k , v ) -> ( v == 0 ) ? 0 : v - 1 );
     }
 
 }

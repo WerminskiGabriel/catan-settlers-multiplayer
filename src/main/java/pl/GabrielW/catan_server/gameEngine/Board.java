@@ -3,6 +3,7 @@ package pl.GabrielW.catan_server.gameEngine;
 import lombok.Getter;
 import pl.GabrielW.catan_server.model.Player;
 
+import javax.smartcardio.Card;
 import java.util.*;
 
 @Getter
@@ -12,38 +13,42 @@ public class Board {
     private HashMap< Coordinate, List< Road > > roads;
     private HashMap< Coordinate, List< Building > > buildings;
     private HashMap< Integer, List< Coordinate > > tokens;
-
-    private ArrayList< CardType > resourcePool = new ArrayList<>( List.of(
-            CardType.Wood , CardType.Wood , CardType.Wood , CardType.Wood ,
-            CardType.Sheep , CardType.Sheep , CardType.Sheep , CardType.Sheep ,
-            CardType.Wheat , CardType.Wheat , CardType.Wheat , CardType.Wheat ,
-            CardType.Brick , CardType.Brick , CardType.Brick ,
-            CardType.Ore , CardType.Ore , CardType.Ore ,
-            CardType.Desert
-    ) );
-    private final ArrayList< Integer > numbersPool = new ArrayList<>( List.of(
-            2 ,
-            3 , 3 ,
-            4 , 4 ,
-            5 , 5 ,
-            6 , 6 ,
-            8 , 8 ,
-            9 , 9 ,
-            10 , 10 ,
-            11 , 11 ,
-            12
-    ) );
+    private ArrayList< CardType > resourcePool;
+    private final ArrayList< Integer > numbersPool;
 
 
     public Board() {
         this.radius = 2;
+        this.roads = new HashMap<>();
+        this.buildings = new HashMap<>();
+        this.tokens = new HashMap<>();
+        this.numbersPool = new ArrayList<>( List.of(
+                2 ,
+                3 , 3 ,
+                4 , 4 ,
+                5 , 5 ,
+                6 , 6 ,
+                8 , 8 ,
+                9 , 9 ,
+                10 , 10 ,
+                11 , 11 ,
+                12
+        ) );
+        this.resourcePool = new ArrayList<>( List.of(
+                CardType.Wood , CardType.Wood , CardType.Wood , CardType.Wood ,
+                CardType.Sheep , CardType.Sheep , CardType.Sheep , CardType.Sheep ,
+                CardType.Wheat , CardType.Wheat , CardType.Wheat , CardType.Wheat ,
+                CardType.Brick , CardType.Brick , CardType.Brick ,
+                CardType.Ore , CardType.Ore , CardType.Ore ,
+                CardType.Desert
+        ) );
         this.cells = generateFullBoard( radius );
-        this.roads =new HashMap<>();
-        this.buildings =new HashMap<>();
-        this.tokens =new HashMap<>();
+
     }
 
-    private HashMap generateFullBoard( int radius ) {
+    private HashMap generateFullBoard( int realRadius ) {
+
+        int radius = realRadius + 1;
 
         Collections.shuffle( this.resourcePool );
         int resourcesIdx = 0;
@@ -64,13 +69,20 @@ public class Board {
             int row = start_curr_cord.r();
 
             Coordinate curr_cord = start_curr_cord;
-            for( int i = 0 ; i < max_cols - Math.abs( row ) ; i++ ) {
+            int max_i = max_cols - Math.abs( row ) - 1;
+            for( int i = 0 ; i <= max_i ; i++ ) {
 
-                CardType resource = this.resourcePool.get( resourcesIdx++ );
-                int token = resource == CardType.Desert ? 0 : this.numbersPool.get( numbersIdx++ );
+                int curr_col = curr_cord.q();
+                int curr_row = curr_cord.r();
+
+                CardType resource = ( Math.abs( curr_row ) == radius || i == 0 || i == max_cols || i == max_i ) ? CardType.Ocean : this.resourcePool.get( resourcesIdx++ );
+                int token = ( resource == CardType.Desert || resource == CardType.Ocean ) ? 0 : this.numbersPool.get( numbersIdx++ );
 
                 cells.put( curr_cord , new Cell( resource , token ) );
-                tokens.get( token ).add( curr_cord );
+                if( token != 0 ) {
+                    //tokens.get( token ).add( curr_cord );
+                    tokens.computeIfAbsent( token , k -> new ArrayList<>() ).add( curr_cord );
+                }
                 curr_cord = curr_cord.move( Direction.EAST );
 
             }
@@ -109,7 +121,13 @@ public class Board {
         for( Coordinate coordinate : cords ) {
             roads.get( coordinate ).add( road );
         }
+    }
 
+    public boolean isRoadPlaceValid( HashSet< Coordinate > cords ) {
+        for( Coordinate coordinate : cords ) {
+            //if( coordinate.equals() )dd
+        }
+        return true;
     }
 
     public void placeBuilding( HashSet< Coordinate > cords , Player player ) {
@@ -123,11 +141,19 @@ public class Board {
 
     }
 
+    public boolean isBuildingPlaceValid( HashSet< Coordinate > cords , Player player ) {
+        for( Coordinate coordinate : cords ) {
+
+        }
+        return true;
+    }
+
+
     public List< Building > coordinateToBuildings( Coordinate coordinate ) {
         return this.buildings.get( coordinate );
     }
 
-    public CardType coordinateToCardType( Coordinate coordinate){
+    public CardType coordinateToCardType( Coordinate coordinate ) {
         return this.cells.get( coordinate ).getCellType();
     }
 

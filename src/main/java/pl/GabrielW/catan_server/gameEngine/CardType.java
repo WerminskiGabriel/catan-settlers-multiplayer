@@ -7,4 +7,5 @@ public enum CardType {
     Brick,
     Sheep,
     Desert,
+    Ocean
 }

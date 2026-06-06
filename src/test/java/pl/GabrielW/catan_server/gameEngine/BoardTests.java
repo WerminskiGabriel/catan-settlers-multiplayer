@@ -13,7 +13,7 @@ public class BoardTests {
 
         System.out.println( board.getCells() );
 
-        assertEquals(19, board.getCells().size() , "size of default board is 19");
+        assertEquals(19 + 18, board.getCells().size() , "size of default board is 19");
     }
 
 }
