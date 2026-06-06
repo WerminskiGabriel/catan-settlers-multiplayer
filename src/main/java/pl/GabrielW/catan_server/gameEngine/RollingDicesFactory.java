@@ -19,8 +19,8 @@ public class RollingDicesFactory {
 
     public void roll() {
 
-        this.dice1 = rnd.nextInt( 1 , 6 );
-        this.dice2 = rnd.nextInt( 1 , 6 );
+        this.dice1 = rnd.nextInt( 1 , 7 );
+        this.dice2 = rnd.nextInt( 1 , 7 );
         this.sum = dice1 + dice2;
     }
 }
