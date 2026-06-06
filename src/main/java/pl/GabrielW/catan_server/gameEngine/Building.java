@@ -7,6 +7,7 @@ import pl.GabrielW.catan_server.model.Player;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -16,6 +17,12 @@ public class Building {
     private HashSet< Coordinate > coordinates;
 
     public Building( HashSet< Coordinate > cords , Player player ) {
+        Objects.requireNonNull( cords , "Coordinates can not be null" );
+        Objects.requireNonNull( player , "Player can not be null" );
+        if (cords.size() != 3 ) {
+            throw new IllegalArgumentException("Building Coordinates must be size 3");
+        }
+
         this.coordinates = cords;
         this.player = player;
     }
