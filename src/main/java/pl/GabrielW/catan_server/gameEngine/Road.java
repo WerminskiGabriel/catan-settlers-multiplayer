@@ -1,10 +1,14 @@
 package pl.GabrielW.catan_server.gameEngine;
 
+import lombok.Getter;
+import lombok.Setter;
 import pl.GabrielW.catan_server.model.Player;
 
 import java.util.HashSet;
 import java.util.Objects;
 
+@Getter
+@Setter
 public class Road {
     private Player player;
     private HashSet< Coordinate > coordinates;

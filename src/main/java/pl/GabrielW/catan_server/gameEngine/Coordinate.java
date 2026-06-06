@@ -1,5 +1,8 @@
 package pl.GabrielW.catan_server.gameEngine;
 
+import lombok.Getter;
+
+
 public record Coordinate( int q , int r ) {
 
     // We use Axial coordiantes more about this system in https://www.redblobgames.com/grids/hexagons/

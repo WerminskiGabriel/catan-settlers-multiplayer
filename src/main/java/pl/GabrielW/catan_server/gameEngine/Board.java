@@ -3,7 +3,6 @@ package pl.GabrielW.catan_server.gameEngine;
 import lombok.Getter;
 import pl.GabrielW.catan_server.model.Player;
 
-import javax.smartcardio.Card;
 import java.util.*;
 
 @Getter
@@ -119,9 +118,53 @@ public class Board {
         }
     }
 
-    public boolean isRoadPlaceValid( HashSet< Coordinate > cords ) {
+    public boolean doRoadConnectToRoadNetwork( HashSet< Coordinate > cords , Player player ) {
+
         for( Coordinate coordinate : cords ) {
-            //if( coordinate.equals() )dd
+            List< Road > roads = coordinateToRoad( coordinate );
+            for( Road road : roads ) {
+                if( !road.getPlayer().equals( player ) ) {
+                    continue;
+                }
+
+                Coordinate unsharedNew = cords.stream()
+                        .filter( c -> !c.equals( coordinate ) )
+                        .findFirst().orElseThrow();
+
+                Coordinate unsharedOld = road.getCoordinates().stream()
+                        .filter( c -> !c.equals( coordinate ) )
+                        .findFirst()
+                        .orElseThrow();
+
+                if( isNeighbor( unsharedNew , unsharedOld ) ) {
+
+                    HashSet< Coordinate > sharedVertex = new HashSet<>( Set.of( coordinate , unsharedNew , unsharedOld ) );
+
+                    if( !isVertexOccupied( sharedVertex ) ) {
+                        return true;
+                    }
+                }
+
+            }
+        }
+        return true;
+    }
+
+    public boolean isVertexOccupied( HashSet< Coordinate > cords ) {
+        for( Coordinate coordinate : cords ) {
+            List< Building > buildings = coordinateToBuildings( coordinate );
+            for( Building building : buildings ) {
+                if( building.getCoordinates().equals( cords ) ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isRoadPlaceValid( HashSet< Coordinate > cords , Player player) {
+        if (!doRoadConnectToRoadNetwork(  cords, player )){
+            return false;
         }
         return true;
     }
@@ -134,16 +177,66 @@ public class Board {
 
     }
 
-    public boolean isBuildingPlaceValid( HashSet< Coordinate > cords , Player player ) {
-        for( Coordinate coordinate : cords ) {
+    public List< HashSet< Coordinate > > roadsFromBuildingCoordinates( HashSet< Coordinate > cords ) {
+        List< Coordinate > buildingCords = new ArrayList<>( cords );
 
+        if( buildingCords.size() != 3 ) {
+            throw new IllegalArgumentException( "Building must have 3 coordinates" );
+        }
+
+        Coordinate a = buildingCords.get( 0 );
+        Coordinate b = buildingCords.get( 1 );
+        Coordinate c = buildingCords.get( 2 );
+
+        HashSet< Coordinate > road1 = new HashSet<>( Set.of( a , b ) );
+        HashSet< Coordinate > road2 = new HashSet<>( Set.of( a , c ) );
+        HashSet< Coordinate > road3 = new HashSet<>( Set.of( b , c ) );
+
+        return List.of( road1 , road2 , road3 );
+    }
+
+    public boolean isBuildingPlaceValid( HashSet< Coordinate > cords , Player player ) {
+
+        boolean connectToRoadNetwork = false;
+        List< HashSet< Coordinate > > allRoads = roadsFromBuildingCoordinates( cords );
+        for( HashSet< Coordinate > roadCords : allRoads ) {
+            if( doRoadConnectToRoadNetwork( roadCords , player ) ) {
+                connectToRoadNetwork = true;
+                break;
+            }
+        }
+        if( !connectToRoadNetwork ) {
+            return false;
+        }
+
+
+        for( Coordinate coordinate : cords ) {
+            List< Building > buildings = coordinateToBuildings( coordinate );
+            for( Building building : buildings ) {
+                HashSet< Coordinate > interSection = new HashSet<>( building.getCoordinates() );
+                interSection.retainAll( cords );
+                if( interSection.size() > 1 ) {
+                    return false;
+                }
+            }
         }
         return true;
     }
 
+    private boolean isNeighbor( Coordinate a , Coordinate b ) {
+        int dq = Math.abs( a.q() - b.q() );
+        int dr = Math.abs( a.r() - b.r() );
+        int ds = Math.abs( ( a.q() + a.r() ) - ( b.q() + b.r() ) );
+
+        return ( ( dq + dr + ds ) / 2 ) == 1;
+    }
 
     public List< Building > coordinateToBuildings( Coordinate coordinate ) {
         return this.buildings.get( coordinate );
+    }
+
+    public List< Road > coordinateToRoad( Coordinate coordinate ) {
+        return this.roads.get( coordinate );
     }
 
     public CardType coordinateToCardType( Coordinate coordinate ) {
