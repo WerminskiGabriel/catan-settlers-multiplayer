@@ -80,7 +80,6 @@ public class Board {
 
                 cells.put( curr_cord , new Cell( resource , token ) );
                 if( token != 0 ) {
-                    //tokens.get( token ).add( curr_cord );
                     tokens.computeIfAbsent( token , k -> new ArrayList<>() ).add( curr_cord );
                 }
                 curr_cord = curr_cord.move( Direction.EAST );
@@ -114,9 +113,6 @@ public class Board {
     }
 
     public void placeRoad( HashSet< Coordinate > cords , Player player ) {
-        if( cords.size() == 0 || cords.size() > 2 ) {
-            throw new IllegalArgumentException( "Road has 1-2 Coordinates" );
-        }
         Road road = new Road( cords , player );
         for( Coordinate coordinate : cords ) {
             roads.get( coordinate ).add( road );
@@ -131,9 +127,6 @@ public class Board {
     }
 
     public void placeBuilding( HashSet< Coordinate > cords , Player player ) {
-        if( cords.size() == 0 || cords.size() > 3 ) {
-            throw new IllegalArgumentException( "Building has 1-3 Coordinates" );
-        }
         Building building = new Building( cords , player );
         for( Coordinate coordinate : cords ) {
             buildings.get( coordinate ).add( building );

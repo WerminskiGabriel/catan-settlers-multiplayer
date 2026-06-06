@@ -15,7 +15,7 @@ public class Road {
         if (cords.size() != 2 ) {
             throw new IllegalArgumentException("Road Coordinates must be size 2");
         }
-        
+
         this.coordinates = cords;
         this.player = player;
     }
