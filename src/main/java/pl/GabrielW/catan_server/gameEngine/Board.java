@@ -112,6 +112,9 @@ public class Board {
     }
 
     public void placeRoad( HashSet< Coordinate > cords , Player player ) {
+        if( !isRoadPlaceValid( cords , player) ){
+            throw new IllegalArgumentException();
+        }
         Road road = new Road( cords , player );
         for( Coordinate coordinate : cords ) {
             roads.get( coordinate ).add( road );
@@ -119,7 +122,6 @@ public class Board {
     }
 
     public boolean doRoadConnectToRoadNetwork( HashSet< Coordinate > cords , Player player ) {
-
         for( Coordinate coordinate : cords ) {
             List< Road > roads = coordinateToRoad( coordinate );
             for( Road road : roads ) {
@@ -136,7 +138,7 @@ public class Board {
                         .findFirst()
                         .orElseThrow();
 
-                if( isNeighbor( unsharedNew , unsharedOld ) ) {
+                if( isNeighbour( unsharedNew , unsharedOld ) ) {
 
                     HashSet< Coordinate > sharedVertex = new HashSet<>( Set.of( coordinate , unsharedNew , unsharedOld ) );
 
@@ -162,8 +164,8 @@ public class Board {
         return false;
     }
 
-    public boolean isRoadPlaceValid( HashSet< Coordinate > cords , Player player) {
-        if (!doRoadConnectToRoadNetwork(  cords, player )){
+    public boolean isRoadPlaceValid( HashSet< Coordinate > cords , Player player ) {
+        if( !doRoadConnectToRoadNetwork( cords , player ) ) {
             return false;
         }
         return true;
@@ -172,7 +174,7 @@ public class Board {
     public void placeBuilding( HashSet< Coordinate > cords , Player player ) {
         Building building = new Building( cords , player );
         for( Coordinate coordinate : cords ) {
-            buildings.get( coordinate ).add( building );
+            buildings.computeIfAbsent( coordinate, k -> new ArrayList<>()).add( building );
         }
 
     }
@@ -223,7 +225,7 @@ public class Board {
         return true;
     }
 
-    private boolean isNeighbor( Coordinate a , Coordinate b ) {
+    public static boolean isNeighbour( Coordinate a , Coordinate b ) {
         int dq = Math.abs( a.q() - b.q() );
         int dr = Math.abs( a.r() - b.r() );
         int ds = Math.abs( ( a.q() + a.r() ) - ( b.q() + b.r() ) );
