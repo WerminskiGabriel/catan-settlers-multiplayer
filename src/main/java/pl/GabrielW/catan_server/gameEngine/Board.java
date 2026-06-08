@@ -109,14 +109,16 @@ public class Board {
         return rPool;
     }
 
-    public void placeRoad( HashSet< Coordinate > cords , Player player ) {
-        if( !isRoadPlaceValid( cords , player ) ) {
-            throw new IllegalArgumentException();
+    public boolean placeRoad( HashSet< Coordinate > cords , Player player ) {
+        if( ! ( canAffordRoad( player) &&  isRoadPlaceValid( cords, player ))) {
+            return false;
         }
         Road road = new Road( cords , player );
         for( Coordinate coordinate : cords ) {
             roads.computeIfAbsent( coordinate , k -> new ArrayList<>() ).add( road );
         }
+
+        return true;
     }
 
     public boolean doRoadConnectToRoadNetwork( HashSet< Coordinate > cords , Player player ) {
@@ -169,48 +171,26 @@ public class Board {
         return true;
     }
 
-    public void placeBuilding( HashSet< Coordinate > cords , Player player ) {
+    public boolean placeBuilding( HashSet< Coordinate > cords , Player player ) {
+        if( ! ( canAffordBuilding( player) &&  isBuildingPlaceValid( cords, player ))) {
+            return false;
+        }
         Building building = new Building( cords , player );
         for( Coordinate coordinate : cords ) {
             buildings.computeIfAbsent( coordinate , k -> new ArrayList<>() ).add( building );
         }
 
-    }
-
-    public boolean CanAffordRoad( Player player ) {
-        HashSet< CardType > requiredTypes = new HashSet<>( Set.of(
-                CardType.WOOD ,
-                CardType.BRICK
-        ) );
-
-        HashMap< CardType, Integer > playerCards = player.getCards();
-
-        for( CardType type : requiredTypes ) {
-            if( playerCards.getOrDefault( type , 0 ) <= 0 ) {
-                return false;
-            }
-        }
-
         return true;
     }
 
-    public boolean CanAffordBuilding( Player player ) {
-        HashSet< CardType > requiredTypes = new HashSet<>( Set.of(
-                CardType.WOOD ,
-                CardType.WHEAT ,
-                CardType.SHEEP ,
-                CardType.BRICK
-        ) );
+    public boolean canAffordRoad( Player player ) {
+        HashMap< CardType, Integer > requiredTypes = Road.cost();
+        return player.CanAffordCards( requiredTypes );
+    }
 
-        HashMap< CardType, Integer > playerCards = player.getCards();
-
-        for( CardType type : requiredTypes ) {
-            if( playerCards.getOrDefault( type , 0 ) <= 0 ) {
-                return false;
-            }
-        }
-
-        return true;
+    public boolean canAffordBuilding( Player player ) {
+        HashMap< CardType, Integer > requiredTypes = Building.cost();
+        return player.CanAffordCards( requiredTypes );
     }
 
     public List< HashSet< Coordinate > > roadsFromBuildingCoordinates( HashSet< Coordinate > cords ) {

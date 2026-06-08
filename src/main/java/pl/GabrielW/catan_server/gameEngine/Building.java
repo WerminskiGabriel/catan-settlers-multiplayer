@@ -3,12 +3,10 @@ package pl.GabrielW.catan_server.gameEngine;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.jmx.export.naming.IdentityNamingStrategy;
 import pl.GabrielW.catan_server.model.Player;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Getter
 @Setter
@@ -38,4 +36,16 @@ public class Building {
         this.player = player;
     }
 
+    public static HashMap< CardType, Integer > cost() {
+        return new HashMap<>( Map.of(
+                CardType.WOOD , 1 ,
+                CardType.WHEAT , 1 ,
+                CardType.SHEEP , 1 ,
+                CardType.BRICK , 1
+        ) );
+    }
+
+    public static int points() {
+        return 1;
+    }
 }
