@@ -3,12 +3,10 @@ package pl.GabrielW.catan_server.gameEngine;
 import org.junit.jupiter.api.Test;
 import pl.GabrielW.catan_server.model.Player;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import javax.smartcardio.Card;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BoardTests {
 
@@ -20,6 +18,64 @@ public class BoardTests {
         System.out.println( board.getCells() );
 
         assertEquals( 37 , board.getCells().size() , "size of default board is 37" );
+    }
+
+    @Test
+    void ResourcesCountByTokens() {
+        Board board = new Board();
+        int tokensCount = 0;
+        for( List< Coordinate > token : board.getTokens().values() ) {
+            tokensCount += token.size();
+        }
+        assertEquals( 18 , tokensCount , "Count of tokens having tiles - non Ocean/desert tiles" );
+    }
+
+    @Test
+    void ResourcesCountByCells() {
+        Board board = new Board();
+        int tokensCount = board.getCells().size();
+        assertEquals( 18 + 19 , tokensCount , "Count of every cell" );
+
+        int tokensNotDC = 0;
+        int DesertCnt = 0;
+        int OceanCnt = 0;
+        for( Cell cell : board.getCells().values() ) {
+            if( cell.getCellType() != CardType.Desert && cell.getCellType() != CardType.Ocean ) {
+                tokensNotDC++;
+            } else {
+                if( cell.getCellType() == CardType.Desert ) {
+                    DesertCnt++;
+                } else {
+                    OceanCnt++;
+                }
+            }
+        }
+        assertEquals( 18 , tokensNotDC , "Count of tiles having - non Ocean/desert tiles" );
+        assertEquals( 1 , DesertCnt , "Count of desert tiles" );
+        assertEquals( 18 , OceanCnt , "Count of  Ocean tiles" );
+
+    }
+
+    @Test
+    void everyTokenCount() {
+        Board board = new Board();
+        HashMap< Integer, Integer > correctTokensCount = new HashMap<>( Map.of(
+                2 , 1 ,
+                3 , 2 ,
+                4 , 2 ,
+                5 , 2 ,
+                6 , 2 ,
+                8 , 2 ,
+                9 , 2 ,
+                10 , 2 ,
+                11 , 2 ,
+                12 , 1
+        ) );
+
+        int tokensCount = 0;
+        board.getTokens().forEach( ( k , v ) -> {
+            assertTrue( v.size() == correctTokensCount.get( k ) , "Count of token(" + k + ") should be " + correctTokensCount.get( k ) + "." );
+        } );
     }
 
     @Test
@@ -37,21 +93,180 @@ public class BoardTests {
 
     }
 
-    /*
     @Test
-    void RoadConnectToRoadNetwork() {
-
+    void resourceDistribution() {
+        Board board = new Board();
+        HashMap< CardType, Integer > counts = new HashMap<>();
+        for( Cell cell : board.getCells().values() ) {
+            CardType type = cell.getCellType();
+            counts.put( type , counts.getOrDefault( type , 0 ) + 1 );
+        }
+        assertEquals( 4 , counts.get( CardType.Wood ) );
+        assertEquals( 4 , counts.get( CardType.Sheep ) );
+        assertEquals( 4 , counts.get( CardType.Wheat ) );
+        assertEquals( 3 , counts.get( CardType.Brick ) );
+        assertEquals( 3 , counts.get( CardType.Ore ) );
     }
 
 
-    isVertexOccupied
-            isRoadPlaceValid
-    placeBuilding( HashSet< Coordinate > cords , Player player ) {
-    public List< HashSet< Coordinate > > roadsFromBuildingCoordinates( HashSet< Coordinate > cords ) {
-         public boolean isBuildingPlaceValid( HashSet< Coordinate > cords , Player player ) {
-        n isNeighbor
+    @Test
+    void desertOceanHaveNoProductionToken() {
+        Board board = new Board();
+        board.getCells().forEach( ( cord , cell ) -> {
+            CardType type = cell.getCellType();
+            if( type == CardType.Desert || type == CardType.Ocean ) {
+                board.getTokens().forEach( ( tokenNum , cordsList ) -> {
+                    assertFalse( cordsList.contains( cord ) );
+                } );
+            }
+        } );
+    }
 
-     */
+    @Test
+    void oceanIsOnEdge() {
+        Board board = new Board();
+        board.getCells().forEach( ( cord , cell ) -> {
+            CardType type = cell.getCellType();
+            if( type == CardType.Ocean ) {
+                int distance = Math.max( Math.abs( cord.q() ) , Math.max( Math.abs( cord.r() ) , Math.abs( cord.q() + cord.r() ) ) );
+                assertTrue( distance >= 2 );
+            }
+        } );
+    }
+
+    @Test
+    void placeBuilding() {
+        Board board = new Board();
+        PlayerFactory pFactory = new PlayerFactory();
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+
+        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        board.placeBuilding( buildingA , playerA );
+
+        assertEquals( true , board.isVertexOccupied( buildingA ) , "this Vertex shoould be occupied - true" );
+
+        for( Coordinate c : buildingA ) {
+            boolean found = false;
+            for( Building b : board.coordinateToBuildings( c ) ) {
+                if( b.getCoordinates().equals( buildingA ) ) {
+                    found = true;
+                }
+            }
+            assertTrue( found );
+        }
+    }
+
+    @Test
+    void emptyHexReturnsEmptyListNotNull() {
+        Board board = new Board();
+        Coordinate invalidCord = new Coordinate( 99 , 99 );
+
+        assertNotNull( board.coordinateToBuildings( invalidCord ) );
+    }
+
+
+    @Test
+    void roadConstructorValidation() {
+        PlayerFactory pFactory = new PlayerFactory();
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > validRoad = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+        HashSet< Coordinate > invalidRoad1 = new HashSet<>( List.of( middleCell ) );
+        HashSet< Coordinate > invalidRoad3 = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.WEST ) ) );
+
+        assertDoesNotThrow( () -> new Road( validRoad , playerA ) );
+        assertThrows( IllegalArgumentException.class , () -> new Road( invalidRoad1 , playerA ) );
+        assertThrows( IllegalArgumentException.class , () -> new Road( invalidRoad3 , playerA ) );
+        assertThrows( NullPointerException.class , () -> new Road( null , playerA ) );
+        assertThrows( NullPointerException.class , () -> new Road( validRoad , null ) );
+    }
+
+    @Test
+    void buildingConstructorValidation() {
+        PlayerFactory pFactory = new PlayerFactory();
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > validBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > invalidBuilding2 = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+
+        assertDoesNotThrow( () -> new Building( validBuilding , playerA ) );
+        assertThrows( IllegalArgumentException.class , () -> new Building( invalidBuilding2 , playerA ) );
+        assertThrows( NullPointerException.class , () -> new Building( null , playerA ) );
+        assertThrows( NullPointerException.class , () -> new Building( validBuilding , null ) );
+    }
+
+    @Test
+    void isNeighborGeometry() {
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+        Coordinate eastNeighbor = middleCell.move( Direction.EAST );
+        Coordinate farCell = middleCell.move( Direction.EAST ).move( Direction.EAST );
+
+        assertTrue( Board.isNeighbour( middleCell , eastNeighbor ) );
+        assertFalse( Board.isNeighbour( middleCell , farCell ) );
+        assertFalse( Board.isNeighbour( middleCell , middleCell ) );
+    }
+
+    @Test
+    void roadsFromBuildingCoordinatesValidation() {
+        Board board = new Board();
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > buildingCords = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        List< HashSet< Coordinate > > roads = board.roadsFromBuildingCoordinates( buildingCords );
+
+        assertEquals( 3 , roads.size() );
+        for( HashSet< Coordinate > road : roads ) {
+            assertEquals( 2 , road.size() );
+        }
+
+        HashSet< Coordinate > invalidCoords = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+        assertThrows( IllegalArgumentException.class , () -> board.roadsFromBuildingCoordinates( invalidCoords ) );
+    }
+
+    @Test
+    void isBuildingPlaceValidDistanceRule() {
+        Board board = new Board();
+        PlayerFactory pFactory = new PlayerFactory();
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerB = pFactory.CreatePlayer( "Momo" );
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > vertex1 = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+
+        assertTrue( board.isBuildingPlaceValid( vertex1 , playerA ) );
+        board.placeBuilding( vertex1 , playerA );
+        assertFalse( board.isBuildingPlaceValid( vertex1 , playerB ) );
+
+        HashSet< Coordinate > adjacentVertexTooClose = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.NORTH_EAST ) ) );
+        assertFalse( board.isBuildingPlaceValid( adjacentVertexTooClose , playerB ) );
+
+        HashSet< Coordinate > safeVertex = new HashSet<>( List.of( middleCell.move( Direction.EAST ) , middleCell.move( Direction.EAST ).move( Direction.EAST ) , middleCell.move( Direction.EAST ).move( Direction.SOUTH_EAST ) ) );
+        assertTrue( board.isBuildingPlaceValid( safeVertex , playerB ) );
+    }
+
+    @Test
+    void doRoadConnectToRoadNetwork() {
+        Board board = new Board();
+        PlayerFactory pFactory = new PlayerFactory();
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerB = pFactory.CreatePlayer( "Momo" );
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > road1 = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+        HashSet< Coordinate > road2Connected = new HashSet<>( List.of( middleCell , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > road3Disconnected = new HashSet<>( List.of( middleCell.move( Direction.WEST ) , middleCell.move( Direction.SOUTH_WEST ) ) );
+
+        assertFalse( board.isRoadPlaceValid( road1 , playerA ) );
+
+        board.placeRoad( road1 , playerA );
+
+        assertTrue( board.isRoadPlaceValid( road2Connected , playerA ) );
+        assertFalse( board.isRoadPlaceValid( road3Disconnected , playerA ) );
+        assertFalse( board.isRoadPlaceValid( road1 , playerB ) );
+    }
 
 
 }

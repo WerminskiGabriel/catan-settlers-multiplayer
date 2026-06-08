@@ -18,9 +18,11 @@ public class Board {
 
     public Board() {
         this.radius = 2;
+
         this.roads = new HashMap<>();
         this.buildings = new HashMap<>();
         this.tokens = new HashMap<>();
+
         this.numbersPool = new ArrayList<>( List.of(
                 2 ,
                 3 , 3 ,
@@ -107,17 +109,13 @@ public class Board {
         return rPool;
     }
 
-    public List< Coordinate > tokenToCoordinates( int token ) {
-        return this.tokens.get( token );
-    }
-
     public void placeRoad( HashSet< Coordinate > cords , Player player ) {
-        if( !isRoadPlaceValid( cords , player) ){
+        if( !isRoadPlaceValid( cords , player ) ) {
             throw new IllegalArgumentException();
         }
         Road road = new Road( cords , player );
         for( Coordinate coordinate : cords ) {
-            roads.get( coordinate ).add( road );
+            roads.computeIfAbsent( coordinate , k -> new ArrayList<>() ).add( road );
         }
     }
 
@@ -174,9 +172,28 @@ public class Board {
     public void placeBuilding( HashSet< Coordinate > cords , Player player ) {
         Building building = new Building( cords , player );
         for( Coordinate coordinate : cords ) {
-            buildings.computeIfAbsent( coordinate, k -> new ArrayList<>()).add( building );
+            buildings.computeIfAbsent( coordinate , k -> new ArrayList<>() ).add( building );
         }
 
+    }
+
+    public boolean playerCanAffordBuilding( Player player ) {
+        HashSet< CardType > requiredTypes = new HashSet<>( Set.of(
+                CardType.Wood ,
+                CardType.Wheat ,
+                CardType.Sheep ,
+                CardType.Brick
+        ) );
+
+        HashMap< CardType, Integer > playerCards = player.getCards();
+
+        for( CardType type : requiredTypes ) {
+            if( playerCards.getOrDefault( type , 0 ) <= 0 ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public List< HashSet< Coordinate > > roadsFromBuildingCoordinates( HashSet< Coordinate > cords ) {
@@ -234,15 +251,19 @@ public class Board {
     }
 
     public List< Building > coordinateToBuildings( Coordinate coordinate ) {
-        return this.buildings.get( coordinate );
+        return this.buildings.getOrDefault( coordinate , new ArrayList< Building >() );
     }
 
     public List< Road > coordinateToRoad( Coordinate coordinate ) {
-        return this.roads.get( coordinate );
+        return this.roads.getOrDefault( coordinate , new ArrayList< Road >() );
     }
 
     public CardType coordinateToCardType( Coordinate coordinate ) {
         return this.cells.get( coordinate ).getCellType();
+    }
+
+    public List< Coordinate > tokenToCoordinates( int token ) {
+        return this.tokens.getOrDefault( token , new ArrayList< Coordinate >() );
     }
 
 

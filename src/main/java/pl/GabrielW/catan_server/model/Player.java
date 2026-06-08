@@ -31,7 +31,7 @@ public class Player {
         this.points = 0;
         this.longestRoadLength = 0;
         this.armyLength = 0;
-        this.cards = new HashMap<>();
+        this.cards = new HashMap<CardType, Integer>();
         this.specialCards = new HashMap<>();
         this.buildingsLeft = 5;
         this.buildingUpgradesLeft = 3;
