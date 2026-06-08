@@ -7,12 +7,12 @@ import java.util.*;
 
 @Getter
 public class Board {
-    private int radius;
+    private final int radius;
     private HashMap< Coordinate, Cell > cells;
     private HashMap< Coordinate, List< Road > > roads;
     private HashMap< Coordinate, List< Building > > buildings;
     private HashMap< Integer, List< Coordinate > > tokens;
-    private ArrayList< CardType > resourcePool;
+    private final ArrayList< CardType > resourcePool;
     private final ArrayList< Integer > numbersPool;
 
 
@@ -36,12 +36,12 @@ public class Board {
                 12
         ) );
         this.resourcePool = new ArrayList<>( List.of(
-                CardType.Wood , CardType.Wood , CardType.Wood , CardType.Wood ,
-                CardType.Sheep , CardType.Sheep , CardType.Sheep , CardType.Sheep ,
-                CardType.Wheat , CardType.Wheat , CardType.Wheat , CardType.Wheat ,
-                CardType.Brick , CardType.Brick , CardType.Brick ,
-                CardType.Ore , CardType.Ore , CardType.Ore ,
-                CardType.Desert
+                CardType.WOOD , CardType.WOOD , CardType.WOOD , CardType.WOOD ,
+                CardType.SHEEP , CardType.SHEEP , CardType.SHEEP , CardType.SHEEP ,
+                CardType.WHEAT , CardType.WHEAT , CardType.WHEAT , CardType.WHEAT ,
+                CardType.BRICK , CardType.BRICK , CardType.BRICK ,
+                CardType.ORE , CardType.ORE , CardType.ORE ,
+                CardType.DESERT
         ) );
         this.cells = generateFullBoard( radius );
 
@@ -76,8 +76,8 @@ public class Board {
                 int curr_col = curr_cord.q();
                 int curr_row = curr_cord.r();
 
-                CardType resource = ( Math.abs( curr_row ) == radius || i == 0 || i == max_cols || i == max_i ) ? CardType.Ocean : this.resourcePool.get( resourcesIdx++ );
-                int token = ( resource == CardType.Desert || resource == CardType.Ocean ) ? 0 : this.numbersPool.get( numbersIdx++ );
+                CardType resource = ( Math.abs( curr_row ) == radius || i == 0 || i == max_cols || i == max_i ) ? CardType.OCEAN : this.resourcePool.get( resourcesIdx++ );
+                int token = ( resource == CardType.DESERT || resource == CardType.OCEAN ) ? 0 : this.numbersPool.get( numbersIdx++ );
 
                 cells.put( curr_cord , new Cell( resource , token ) );
                 if( token != 0 ) {
@@ -177,12 +177,29 @@ public class Board {
 
     }
 
-    public boolean playerCanAffordBuilding( Player player ) {
+    public boolean CanAffordRoad( Player player ) {
         HashSet< CardType > requiredTypes = new HashSet<>( Set.of(
-                CardType.Wood ,
-                CardType.Wheat ,
-                CardType.Sheep ,
-                CardType.Brick
+                CardType.WOOD ,
+                CardType.BRICK
+        ) );
+
+        HashMap< CardType, Integer > playerCards = player.getCards();
+
+        for( CardType type : requiredTypes ) {
+            if( playerCards.getOrDefault( type , 0 ) <= 0 ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean CanAffordBuilding( Player player ) {
+        HashSet< CardType > requiredTypes = new HashSet<>( Set.of(
+                CardType.WOOD ,
+                CardType.WHEAT ,
+                CardType.SHEEP ,
+                CardType.BRICK
         ) );
 
         HashMap< CardType, Integer > playerCards = player.getCards();

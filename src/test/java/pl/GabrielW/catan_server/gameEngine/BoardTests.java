@@ -3,7 +3,6 @@ package pl.GabrielW.catan_server.gameEngine;
 import org.junit.jupiter.api.Test;
 import pl.GabrielW.catan_server.model.Player;
 
-import javax.smartcardio.Card;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,10 +39,10 @@ public class BoardTests {
         int DesertCnt = 0;
         int OceanCnt = 0;
         for( Cell cell : board.getCells().values() ) {
-            if( cell.getCellType() != CardType.Desert && cell.getCellType() != CardType.Ocean ) {
+            if( cell.getCellType() != CardType.DESERT && cell.getCellType() != CardType.OCEAN ) {
                 tokensNotDC++;
             } else {
-                if( cell.getCellType() == CardType.Desert ) {
+                if( cell.getCellType() == CardType.DESERT ) {
                     DesertCnt++;
                 } else {
                     OceanCnt++;
@@ -101,11 +100,11 @@ public class BoardTests {
             CardType type = cell.getCellType();
             counts.put( type , counts.getOrDefault( type , 0 ) + 1 );
         }
-        assertEquals( 4 , counts.get( CardType.Wood ) );
-        assertEquals( 4 , counts.get( CardType.Sheep ) );
-        assertEquals( 4 , counts.get( CardType.Wheat ) );
-        assertEquals( 3 , counts.get( CardType.Brick ) );
-        assertEquals( 3 , counts.get( CardType.Ore ) );
+        assertEquals( 4 , counts.get( CardType.WOOD ) );
+        assertEquals( 4 , counts.get( CardType.SHEEP ) );
+        assertEquals( 4 , counts.get( CardType.WHEAT ) );
+        assertEquals( 3 , counts.get( CardType.BRICK ) );
+        assertEquals( 3 , counts.get( CardType.ORE ) );
     }
 
 
@@ -114,7 +113,7 @@ public class BoardTests {
         Board board = new Board();
         board.getCells().forEach( ( cord , cell ) -> {
             CardType type = cell.getCellType();
-            if( type == CardType.Desert || type == CardType.Ocean ) {
+            if( type == CardType.DESERT || type == CardType.OCEAN ) {
                 board.getTokens().forEach( ( tokenNum , cordsList ) -> {
                     assertFalse( cordsList.contains( cord ) );
                 } );
@@ -127,7 +126,7 @@ public class BoardTests {
         Board board = new Board();
         board.getCells().forEach( ( cord , cell ) -> {
             CardType type = cell.getCellType();
-            if( type == CardType.Ocean ) {
+            if( type == CardType.OCEAN ) {
                 int distance = Math.max( Math.abs( cord.q() ) , Math.max( Math.abs( cord.r() ) , Math.abs( cord.q() + cord.r() ) ) );
                 assertTrue( distance >= 2 );
             }
