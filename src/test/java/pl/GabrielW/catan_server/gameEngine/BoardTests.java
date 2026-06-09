@@ -86,8 +86,18 @@ public class BoardTests {
 
         Player playerA = pFactory.CreatePlayer( "Appa" );
         HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
-        board.placeBuilding( buildingA , playerA );
-        assertEquals( true , board.isVertexOccupied( buildingA ) , "this Vertex shoould be occupied - true" );
+        HashSet< Coordinate > roadFromBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+
+        playerA.addCards( Building.cost() );
+        assertTrue( board.canAffordBuilding( playerA ) );
+
+        assertTrue( board.placeBuilding( buildingA , playerA , true ) );
+
+        playerA.addCards( Road.cost() );
+        assertTrue( board.canAffordRoad( playerA ) );
+        assertTrue( board.isRoadPlaceValid( roadFromBuilding , playerA ) );
+        assertTrue( board.placeRoad( roadFromBuilding , playerA ) , "road from settlement should place" );
+        assertEquals( 1 , board.coordinateToRoads( middleCell ).size() , "should be just 1 road" );
 
 
     }
@@ -141,9 +151,11 @@ public class BoardTests {
         Player playerA = pFactory.CreatePlayer( "Appa" );
 
         HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
-        board.placeBuilding( buildingA , playerA );
+        playerA.addCards( Building.cost() );
+        assertTrue( board.canAffordBuilding( playerA ) );
+        board.placeBuilding( buildingA , playerA , true );
 
-        assertEquals( true , board.isVertexOccupied( buildingA ) , "this Vertex shoould be occupied - true" );
+        assertEquals( true , board.isVertexOccupied( buildingA ) , "this Vertex should be occupied - true" );
 
         for( Coordinate c : buildingA ) {
             boolean found = false;
@@ -236,7 +248,10 @@ public class BoardTests {
         HashSet< Coordinate > vertex1 = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
 
         assertTrue( board.isBuildingPlaceValid( vertex1 , playerA ) );
-        board.placeBuilding( vertex1 , playerA );
+        playerA.addCards( Building.cost() );
+        assertTrue( board.canAffordBuilding( playerA ) );
+        board.placeBuilding( vertex1 , playerA , true );
+
         assertFalse( board.isBuildingPlaceValid( vertex1 , playerB ) );
 
         HashSet< Coordinate > adjacentVertexTooClose = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.NORTH_EAST ) ) );
@@ -254,12 +269,20 @@ public class BoardTests {
         Player playerB = pFactory.CreatePlayer( "Momo" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        HashSet< Coordinate > road1 = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
-        HashSet< Coordinate > road2Connected = new HashSet<>( List.of( middleCell , middleCell.move( Direction.SOUTH_EAST ) ) );
-        HashSet< Coordinate > road3Disconnected = new HashSet<>( List.of( middleCell.move( Direction.WEST ) , middleCell.move( Direction.SOUTH_WEST ) ) );
+        HashSet< Coordinate > building = new HashSet<>( Set.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > road1 = new HashSet<>( Set.of( middleCell , middleCell.move( Direction.EAST ) ) );
+        HashSet< Coordinate > road2Connected = new HashSet<>( Set.of( middleCell , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > road3Disconnected = new HashSet<>( Set.of( middleCell.move( Direction.WEST ) , middleCell.move( Direction.SOUTH_WEST ) ) );
 
-        assertFalse( board.isRoadPlaceValid( road1 , playerA ) );
+        playerA.addCards( Building.cost() );
+        assertTrue( board.canAffordBuilding( playerA ) );
+        assertTrue( board.isBuildingPlaceValid( building , playerA ) );
+        assertTrue( board.placeBuilding( building , playerA , true ) );
 
+        assertTrue( board.isRoadPlaceValid( road1 , playerA ) );
+
+        playerA.addCards( Road.cost() );
+        assertTrue( board.canAffordRoad( playerA ) );
         board.placeRoad( road1 , playerA );
 
         assertTrue( board.isRoadPlaceValid( road2Connected , playerA ) );
@@ -267,5 +290,137 @@ public class BoardTests {
         assertFalse( board.isRoadPlaceValid( road1 , playerB ) );
     }
 
+    @Test
+    void setupBuildingWithoutRoad() {
+        Board board = new Board();
+        PlayerFactory pFactory = new PlayerFactory();
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+
+        playerA.addCards( Building.cost() );
+        assertTrue( board.placeBuilding( buildingA , playerA , true ) , "setup building should work without road" );
+        assertTrue( board.isVertexOccupied( buildingA ) , "vertex should be occupied after setup place" );
+    }
+
+    @Test
+    void mainBuildingWithoutRoadFails() {
+        Board board = new Board();
+        PlayerFactory pFactory = new PlayerFactory();
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+
+        playerA.addCards( Building.cost() );
+        assertFalse( board.placeBuilding( buildingA , playerA , false ) , "main building without road should fail" );
+        assertFalse( board.isVertexOccupied( buildingA ) , "vertex should stay empty" );
+    }
+
+    @Test
+    void doRoadConnectToBuildingAfterSetup() {
+        Board board = new Board();
+        PlayerFactory pFactory = new PlayerFactory();
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > roadFromBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+
+        playerA.addCards( Building.cost() );
+        board.placeBuilding( buildingA , playerA , true );
+
+        assertTrue( board.doRoadConnectToBuilding( roadFromBuilding , playerA ) , "road touching own building should connect" );
+    }
+
+    @Test
+    void firstRoadFromSettlementValid() {
+        Board board = new Board();
+        PlayerFactory pFactory = new PlayerFactory();
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > roadFromBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+
+        playerA.addCards( Building.cost() );
+        board.placeBuilding( buildingA , playerA , true );
+
+        playerA.addCards( Road.cost() );
+        assertTrue( board.isRoadPlaceValid( roadFromBuilding , playerA ) , "first road from own settlement should be valid" );
+        assertTrue( board.placeRoad( roadFromBuilding , playerA ) , "first road from own settlement should place" );
+    }
+
+    @Test
+    void placeRoadWithoutResourcesFails() {
+        Board board = new Board();
+        PlayerFactory pFactory = new PlayerFactory();
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > roadFromBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+
+        playerA.addCards( Building.cost() );
+        assertTrue( board.placeBuilding( buildingA , playerA , true ) );
+
+        System.out.println( playerA.getCards() );
+        assertFalse( board.canAffordRoad( playerA ) );
+        assertFalse( board.placeRoad( roadFromBuilding , playerA ) , "road without resources should fail" );
+        assertEquals( 0 , board.coordinateToRoads( middleCell ).size() , "no road should be on board" );
+    }
+
+    @Test
+    void doBuldingConnectToRoadAfterPlaceRoad() {
+        Board board = new Board();
+        PlayerFactory pFactory = new PlayerFactory();
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > roadFromBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+
+        playerA.addCards( Building.cost() );
+        board.placeBuilding( buildingA , playerA , true );
+
+        playerA.addCards( Road.cost() );
+        board.placeRoad( roadFromBuilding , playerA );
+
+        assertTrue( board.doBuldingConnectToRoad( buildingA , playerA ) , "building should connect to own road" );
+    }
+
+    @Test
+    void doBuldingConnectToRoadWrongSizeThrows() {
+        Board board = new Board();
+        PlayerFactory pFactory = new PlayerFactory();
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > wrongSize = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+
+        assertThrows( IllegalArgumentException.class , () -> board.doBuldingConnectToRoad( wrongSize , playerA ) );
+    }
+
+    @Test
+    void roadInMiddleWithoutBuildingInvalid() {
+        Board board = new Board();
+        PlayerFactory pFactory = new PlayerFactory();
+        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Coordinate middleCell = new Coordinate( 0 , 0 );
+
+        HashSet< Coordinate > lonelyRoad = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+
+        playerA.addCards( Road.cost() );
+        assertFalse( board.isRoadPlaceValid( lonelyRoad , playerA ) , "road without building or network should be invalid" );
+    }
+
+    @Test
+    void tokenSevenReturnsEmptyList() {
+        Board board = new Board();
+
+        assertNotNull( board.tokenToCoordinates( 7 ) );
+        assertEquals( 0 , board.tokenToCoordinates( 7 ).size() , "token 7 should have no production tiles" );
+    }
 
 }

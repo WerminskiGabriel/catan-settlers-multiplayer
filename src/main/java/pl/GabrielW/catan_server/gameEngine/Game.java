@@ -42,7 +42,7 @@ public class Game {
                 int diceSum = rollingDicesFactory.getSum();
                 List< Coordinate > coordinates = board.tokenToCoordinates( diceSum );
                 for( Coordinate coordinate : coordinates ) {
-                    CardType cardType = board.coordinateToCardType( coordinate );
+                    CardType cardType = board.coordinateToCardTypes( coordinate );
                     List< Building > buildings = board.coordinateToBuildings( coordinate );
                     for( Building building : buildings ) {
                         Player player = building.getPlayer();
