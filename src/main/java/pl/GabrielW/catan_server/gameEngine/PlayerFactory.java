@@ -7,19 +7,22 @@ import java.util.List;
 
 public class PlayerFactory {
 
-    private List< PlayerColor > AvailableColors;
+    private List< PlayerColor > availableColors;
 
-    public PlayerFactory() {
-        this.AvailableColors = new ArrayList<>( List.of( PlayerColor.values() ) );
+    public PlayerFactory( ) {
+        this.availableColors = new ArrayList<>( List.of( PlayerColor.values( ) ) );
     }
 
-    public Player CreatePlayer( String nickName ) {
-        PlayerColor color = AvailableColors.removeLast();
+    public Player createPlayer( String nickName ) {
+        PlayerColor color = availableColors.removeLast( );
 
         Player player = new Player( nickName , color );
 
         return player;
+    }
 
+    public void addColor( PlayerColor color ) {
+        availableColors.add( color );
     }
 
 

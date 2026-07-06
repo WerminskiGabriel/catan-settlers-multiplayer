@@ -7,5 +7,5 @@ public enum TurnPhase {
     ROBBER_PLACEMENT,
     STEAL_PHASE,
     GAME_OVER,
-    FIRST_2_TURNS
+    START_MENU,
 }

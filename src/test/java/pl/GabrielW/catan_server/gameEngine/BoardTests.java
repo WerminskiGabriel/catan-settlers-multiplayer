@@ -84,7 +84,7 @@ public class BoardTests {
 
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerA = pFactory.createPlayer( "Appa" );
         HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
         HashSet< Coordinate > roadFromBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
 
@@ -148,7 +148,7 @@ public class BoardTests {
         Board board = new Board();
         PlayerFactory pFactory = new PlayerFactory();
         Coordinate middleCell = new Coordinate( 0 , 0 );
-        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerA = pFactory.createPlayer( "Appa" );
 
         HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
         playerA.addCards( Building.cost() );
@@ -180,7 +180,7 @@ public class BoardTests {
     @Test
     void roadConstructorValidation() {
         PlayerFactory pFactory = new PlayerFactory();
-        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         HashSet< Coordinate > validRoad = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
@@ -197,7 +197,7 @@ public class BoardTests {
     @Test
     void buildingConstructorValidation() {
         PlayerFactory pFactory = new PlayerFactory();
-        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         HashSet< Coordinate > validBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
@@ -241,8 +241,8 @@ public class BoardTests {
     void isBuildingPlaceValidDistanceRule() {
         Board board = new Board();
         PlayerFactory pFactory = new PlayerFactory();
-        Player playerA = pFactory.CreatePlayer( "Appa" );
-        Player playerB = pFactory.CreatePlayer( "Momo" );
+        Player playerA = pFactory.createPlayer( "Appa" );
+        Player playerB = pFactory.createPlayer( "Momo" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         HashSet< Coordinate > vertex1 = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
@@ -265,8 +265,8 @@ public class BoardTests {
     void doRoadConnectToRoadNetwork() {
         Board board = new Board();
         PlayerFactory pFactory = new PlayerFactory();
-        Player playerA = pFactory.CreatePlayer( "Appa" );
-        Player playerB = pFactory.CreatePlayer( "Momo" );
+        Player playerA = pFactory.createPlayer( "Appa" );
+        Player playerB = pFactory.createPlayer( "Momo" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         HashSet< Coordinate > building = new HashSet<>( Set.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
@@ -294,7 +294,7 @@ public class BoardTests {
     void setupBuildingWithoutRoad() {
         Board board = new Board();
         PlayerFactory pFactory = new PlayerFactory();
-        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
@@ -308,7 +308,7 @@ public class BoardTests {
     void mainBuildingWithoutRoadFails() {
         Board board = new Board();
         PlayerFactory pFactory = new PlayerFactory();
-        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
@@ -322,7 +322,7 @@ public class BoardTests {
     void doRoadConnectToBuildingAfterSetup() {
         Board board = new Board();
         PlayerFactory pFactory = new PlayerFactory();
-        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
@@ -338,7 +338,7 @@ public class BoardTests {
     void firstRoadFromSettlementValid() {
         Board board = new Board();
         PlayerFactory pFactory = new PlayerFactory();
-        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
@@ -356,7 +356,7 @@ public class BoardTests {
     void placeRoadWithoutResourcesFails() {
         Board board = new Board();
         PlayerFactory pFactory = new PlayerFactory();
-        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
@@ -375,7 +375,7 @@ public class BoardTests {
     void doBuldingConnectToRoadAfterPlaceRoad() {
         Board board = new Board();
         PlayerFactory pFactory = new PlayerFactory();
-        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
@@ -394,7 +394,7 @@ public class BoardTests {
     void doBuldingConnectToRoadWrongSizeThrows() {
         Board board = new Board();
         PlayerFactory pFactory = new PlayerFactory();
-        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         HashSet< Coordinate > wrongSize = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
@@ -406,7 +406,7 @@ public class BoardTests {
     void roadInMiddleWithoutBuildingInvalid() {
         Board board = new Board();
         PlayerFactory pFactory = new PlayerFactory();
-        Player playerA = pFactory.CreatePlayer( "Appa" );
+        Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         HashSet< Coordinate > lonelyRoad = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );

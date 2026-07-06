@@ -14,7 +14,7 @@ public class BuildingTests {
     @Test
     public void buildingInit() {
         PlayerFactory playerFactory = new PlayerFactory();
-        Player player = playerFactory.CreatePlayer( "Aang" );
+        Player player = playerFactory.createPlayer( "Aang" );
 
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
