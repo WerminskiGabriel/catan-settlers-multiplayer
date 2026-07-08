@@ -132,15 +132,15 @@ public class GameTests {
         List< Player > players = game.getPlayers( );
 
         game.setTurnPhase( TurnPhase.TRADE_AND_BUILD );
-        game.endTurn( );
+        game.startGame( );
         assertSame( players.get( 0 ) , game.getCurrentPlayer( ) );
-        assertEquals( 1 , game.getTurnNumber( ) );
+        assertEquals( 0, game.getTurnNumber( ) );
         assertEquals( TurnPhase.ROLL_PHASE , game.getTurnPhase( ) );
 
         game.setTurnPhase( TurnPhase.TRADE_AND_BUILD );
         game.endTurn( );
         assertSame( players.get( 1 ) , game.getCurrentPlayer( ) );
-        assertEquals( 2 , game.getTurnNumber( ) );
+        assertEquals( 1 , game.getTurnNumber( ) );
 
         game.setTurnPhase( TurnPhase.TRADE_AND_BUILD );
         game.endTurn( );

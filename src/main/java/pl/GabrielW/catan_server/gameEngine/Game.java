@@ -83,20 +83,20 @@ public class Game {
 
     }
 
-    public void buildRoad( HashSet< Coordinate > newB ) {
+    public boolean buildRoad( HashSet< Coordinate > newB ) {
         if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
             throw new IllegalStateException( "Wrong turnPhase" );
         }
-        board.placeRoad( newB , currentPlayer );
+        return board.placeRoad( newB , currentPlayer );
     }
 
-    public void buildBuilding( HashSet< Coordinate > newB ) {
+    public boolean buildBuilding( HashSet< Coordinate > newB ) {
         if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
             throw new IllegalStateException( "Wrong turnPhase" );
         }
 
         boolean isSetup = turnNumber % players.size( ) < 2;
-        board.placeBuilding( newB , currentPlayer , isSetup );
+        return board.placeBuilding( newB , currentPlayer , isSetup );
     }
 
     public void discardCards( ) {
@@ -137,12 +137,12 @@ public class Game {
         turnPhase = TurnPhase.TRADE_AND_BUILD;
     }
 
-    public void endTurn( ) throws Exception {
+    public void endTurn( ) {
         if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
             throw new IllegalStateException( "Wrong turnPhase" );
         }
-        currentPlayer = players.get( turnNumber % players.size( ) );
         turnNumber += 1;
+        currentPlayer = players.get( turnNumber % players.size( ) );
 
         turnPhase = TurnPhase.ROLL_PHASE;
     }
@@ -151,6 +151,10 @@ public class Game {
         if( this.players.size( ) < 2 ) {
             throw new IllegalArgumentException( "There must be at least 2 players in Game" );
         }
+        if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
+            throw new IllegalStateException( "Wrong turnPhase" );
+        }
+
         turnPhase = TurnPhase.ROLL_PHASE;
         currentPlayer = players.get( 0 );
     }
