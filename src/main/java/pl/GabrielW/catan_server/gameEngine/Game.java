@@ -152,6 +152,7 @@ public class Game {
             throw new IllegalArgumentException( "There must be at least 2 players in Game" );
         }
         turnPhase = TurnPhase.ROLL_PHASE;
+        currentPlayer = players.get( 0 );
     }
 
 
