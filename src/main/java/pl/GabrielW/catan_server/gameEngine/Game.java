@@ -1,6 +1,7 @@
 package pl.GabrielW.catan_server.gameEngine;
 
 import lombok.Getter;
+import lombok.Setter;
 import pl.GabrielW.catan_server.model.Player;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @Getter
+@Setter
 public class Game {
     private final Board board;
     private final ArrayList< Player > players;
@@ -43,7 +45,7 @@ public class Game {
 
     public void rollDice( ) {
         if( turnPhase != TurnPhase.ROLL_PHASE ) {
-            return;
+            throw new IllegalStateException( "Wrong turnPhase" );
         }
 
         this.rollingDicesFactory.roll( );
@@ -69,7 +71,7 @@ public class Game {
 
     public void trade( HashMap< CardType, Integer > thisCards , HashMap< CardType, Integer > otherCards , Player otherP ) {
         if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
-            return;
+            throw new IllegalStateException( "Wrong turnPhase" );
         }
 
         if( currentPlayer.canAfford( thisCards ) && otherP.canAfford( otherCards ) ) {
@@ -83,14 +85,14 @@ public class Game {
 
     public void buildRoad( HashSet< Coordinate > newB ) {
         if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
-            return;
+            throw new IllegalStateException( "Wrong turnPhase" );
         }
         board.placeRoad( newB , currentPlayer );
     }
 
     public void buildBuilding( HashSet< Coordinate > newB ) {
         if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
-            return;
+            throw new IllegalStateException( "Wrong turnPhase" );
         }
 
         boolean isSetup = turnNumber % players.size( ) < 2;
@@ -99,7 +101,7 @@ public class Game {
 
     public void discardCards( ) {
         if( turnPhase != TurnPhase.DISCARD_PHASE ) {
-            return;
+            throw new IllegalStateException( "Wrong turnPhase" );
         }
 
         //TODO change random to choosing
@@ -113,7 +115,7 @@ public class Game {
 
     public void placeRobber( Coordinate newRobber ) {
         if( turnPhase != TurnPhase.ROBBER_PLACEMENT ) {
-            return;
+            throw new IllegalStateException( "Wrong turnPhase" );
         }
         this.robberCord = newRobber;
         turnPhase = TurnPhase.STEAL_PHASE;
@@ -121,7 +123,7 @@ public class Game {
 
     public void stealCard( Player stealFromP ) {
         if( turnPhase != TurnPhase.STEAL_PHASE ) {
-            return;
+            throw new IllegalStateException( "Wrong turnPhase" );
         }
 
         if( stealFromP.hasCardsAboveLimit( 0 ) ) {
@@ -135,14 +137,20 @@ public class Game {
         turnPhase = TurnPhase.TRADE_AND_BUILD;
     }
 
-    public void endTurn( ) {
+    public void endTurn( ) throws Exception {
         if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
-            return;
-
+            throw new IllegalStateException( "Wrong turnPhase" );
         }
         currentPlayer = players.get( turnNumber % players.size( ) );
         turnNumber += 1;
 
+        turnPhase = TurnPhase.ROLL_PHASE;
+    }
+
+    public void startGame( ) {
+        if( this.players.size( ) < 2 ) {
+            throw new IllegalArgumentException( "There must be at least 2 players in Game" );
+        }
         turnPhase = TurnPhase.ROLL_PHASE;
     }
 
