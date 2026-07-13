@@ -4,15 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 import pl.GabrielW.catan_server.model.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
 public class Game {
     private final Board board;
+    private final UUID id;
     private final ArrayList< Player > players;
     private Player currentPlayer;
     private final PlayerFactory playerFactory;
@@ -25,6 +23,7 @@ public class Game {
 
     public Game( ) {
         this.board = new Board( );
+        this.id = UUID.randomUUID();
         this.players = new ArrayList<>( );
         this.playerFactory = new PlayerFactory( );
         this.turnNumber = 0;
@@ -42,6 +41,9 @@ public class Game {
         this.players.removeIf( player -> player.getNickName( ).equals( nickName ) );
     }
 
+    public Player getPlayer( String nickName ){
+        return players.stream().filter( p -> p.getNickName().equals( nickName ) ).findFirst().orElseThrow() ;
+    }
 
     public void rollDice( ) {
         if( turnPhase != TurnPhase.ROLL_PHASE ) {
