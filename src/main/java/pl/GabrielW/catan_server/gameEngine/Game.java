@@ -23,7 +23,7 @@ public class Game {
 
     public Game( ) {
         this.board = new Board( );
-        this.id = UUID.randomUUID();
+        this.id = UUID.randomUUID( );
         this.players = new ArrayList<>( );
         this.playerFactory = new PlayerFactory( );
         this.turnNumber = 0;
@@ -32,17 +32,30 @@ public class Game {
         this.limitMT = 7;
     }
 
+    /**
+     *
+     * @param nickName
+     */
     public void addPlayer( String nickName ) {
         Player player = this.playerFactory.createPlayer( nickName );
         players.add( player );
     }
 
+    /**
+     *
+     * @param nickName
+     */
     public void removePlayer( String nickName ) {
         this.players.removeIf( player -> player.getNickName( ).equals( nickName ) );
     }
 
-    public Player getPlayer( String nickName ){
-        return players.stream().filter( p -> p.getNickName().equals( nickName ) ).findFirst().orElseThrow() ;
+    /**
+     *
+     * @param nickName
+     * @return
+     */
+    public Player getPlayer( String nickName ) {
+        return players.stream( ).filter( p -> p.getNickName( ).equals( nickName ) ).findFirst( ).orElseThrow( );
     }
 
     public void rollDice( ) {
@@ -71,6 +84,13 @@ public class Game {
 
     }
 
+
+    /**
+     *
+     * @param thisCards
+     * @param otherCards
+     * @param otherP
+     */
     public void trade( HashMap< CardType, Integer > thisCards , HashMap< CardType, Integer > otherCards , Player otherP ) {
         if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
             throw new IllegalStateException( "Wrong turnPhase" );
@@ -85,6 +105,35 @@ public class Game {
 
     }
 
+    /**
+     *
+     * @param thisCards
+     * @param otherCards
+     * @param otherPlayerNickName
+     */
+    public void trade( HashMap< CardType, Integer > thisCards , HashMap< CardType, Integer > otherCards , String otherPlayerNickName ) {
+        Player otherP = getPlayer( otherPlayerNickName );
+        if( otherP == null ) {
+            throw new IllegalArgumentException( "Player u want to trade with does not exist: " + otherPlayerNickName );
+        }
+        if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
+            throw new IllegalStateException( "Wrong turnPhase" );
+        }
+
+        if( currentPlayer.canAfford( thisCards ) && otherP.canAfford( otherCards ) ) {
+            currentPlayer.removeCards( thisCards );
+            currentPlayer.addCards( otherCards );
+            otherP.removeCards( otherCards );
+            otherP.addCards( thisCards );
+        }
+
+    }
+
+    /**
+     *
+     * @param newB
+     * @return
+     */
     public boolean buildRoad( HashSet< Coordinate > newB ) {
         if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
             throw new IllegalStateException( "Wrong turnPhase" );
@@ -92,15 +141,23 @@ public class Game {
         return board.placeRoad( newB , currentPlayer );
     }
 
+    /**
+     *
+     * @param newB
+     * @return
+     */
     public boolean buildBuilding( HashSet< Coordinate > newB ) {
         if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
             throw new IllegalStateException( "Wrong turnPhase" );
         }
 
-        boolean isSetup = turnNumber % players.size( ) < 2;
+        boolean isSetup = turnNumber < players.size( ) * 2;
         return board.placeBuilding( newB , currentPlayer , isSetup );
     }
 
+    /**
+     *
+     */
     public void discardCards( ) {
         if( turnPhase != TurnPhase.DISCARD_PHASE ) {
             throw new IllegalStateException( "Wrong turnPhase" );
@@ -115,6 +172,10 @@ public class Game {
         turnPhase = TurnPhase.ROBBER_PLACEMENT;
     }
 
+    /**
+     *
+     * @param newRobber
+     */
     public void placeRobber( Coordinate newRobber ) {
         if( turnPhase != TurnPhase.ROBBER_PLACEMENT ) {
             throw new IllegalStateException( "Wrong turnPhase" );
@@ -123,6 +184,34 @@ public class Game {
         turnPhase = TurnPhase.STEAL_PHASE;
     }
 
+    /**
+     *
+     * @param stealFromPlayerNickName
+     */
+    public void stealCard( String stealFromPlayerNickName ) {
+        Player stealFromP = getPlayer( stealFromPlayerNickName );
+        if( stealFromP == null ) {
+            throw new IllegalArgumentException( "Player u want to steal from does not exist: " + stealFromPlayerNickName );
+        }
+        if( turnPhase != TurnPhase.STEAL_PHASE ) {
+            throw new IllegalStateException( "Wrong turnPhase" );
+        }
+
+        if( stealFromP.hasCardsAboveLimit( 0 ) ) {
+
+            CardType stolenCard = stealFromP.getRandomCard( );
+            stealFromP.removeCard( stolenCard );
+            currentPlayer.addCard( stolenCard );
+        } else {
+            //throw
+        }
+        turnPhase = TurnPhase.TRADE_AND_BUILD;
+    }
+
+    /**
+     *
+     * @param stealFromP
+     */
     public void stealCard( Player stealFromP ) {
         if( turnPhase != TurnPhase.STEAL_PHASE ) {
             throw new IllegalStateException( "Wrong turnPhase" );
@@ -138,6 +227,7 @@ public class Game {
         }
         turnPhase = TurnPhase.TRADE_AND_BUILD;
     }
+
 
     public void endTurn( ) {
         if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
