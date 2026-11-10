@@ -6,6 +6,7 @@ import org.springframework.web.server.ResponseStatusException;
 import pl.GabrielW.catan_server.api.dto.GameActionRequest;
 import pl.GabrielW.catan_server.gameEngine.Game;
 import pl.GabrielW.catan_server.gameEngine.TurnPhase;
+import tools.jackson.databind.util.Converter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,14 +46,14 @@ public class GameService {
             case TurnPhase.ROLL_PHASE -> game.rollDice( );
             case TurnPhase.DISCARD_PHASE -> game.discardCards( );
             case TurnPhase.STEAL_PHASE -> game.stealCard( game.getPlayer( action.otherPlayerNickName( ) ) );
-            case TurnPhase.GAME_OVER -> ;
-            case TurnPhase.TRADE_AND_BUILD ->
-                    game.trade( action.TradeCardsOut( ) , action.TradeCardsIn( ) , game.getPlayer( action.otherPlayerNickName( ) ) );
-                    game.buildBuilding( action.coordinates() );
-                    game.buildRoad(  action.coordinates());
-            ;
-            case TurnPhase.ROBBER_PLACEMENT -> game.placeRobber( action.coordinate() );
-            case TurnPhase.START_MENU -> ;
+            case TurnPhase.GAME_OVER -> { }
+            case TurnPhase.TRADE_AND_BUILD -> {
+                game.trade( action.TradeCardsOut( ) , action.TradeCardsIn( ) , game.getPlayer( action.otherPlayerNickName( ) ) );
+                game.buildBuilding( action.coordinates( ) );
+                game.buildRoad( action.coordinates( ) );
+            }
+            case TurnPhase.ROBBER_PLACEMENT -> game.placeRobber( action.coordinate( ) );
+            case TurnPhase.START_MENU -> {}
             default -> throw new IllegalStateException( "Wrong action" );
         }
 

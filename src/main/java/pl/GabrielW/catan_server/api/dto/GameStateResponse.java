@@ -12,12 +12,12 @@ public record GameStateResponse(
         String currentPlayerNickName ,
         List< String > players
 ) {
-    public static GameStateResponse from( UUID id, Game game ){
+    public static GameStateResponse from( Game game ) {
         return new GameStateResponse(
-                id,
-                game.getTurnPhase(),
-                game.getCurrentPlayer().getNickName(),
-                game.getPlayers().stream().map( p -> p.getNickName() ).toList()
+                game.getId( ) ,
+                game.getTurnPhase( ) ,
+                game.getCurrentPlayer( ).getNickName( ) ,
+                game.getPlayers( ).stream( ).map( p -> p.getNickName( ) ).toList( )
         );
     }
 
