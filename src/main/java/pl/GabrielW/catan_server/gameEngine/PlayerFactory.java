@@ -14,9 +14,13 @@ public class PlayerFactory {
     }
 
     public Player createPlayer( String nickName ) {
+        return createPlayer( nickName , null );
+    }
+
+    public Player createPlayer( String nickName, String hashToken ) {
         PlayerColor color = availableColors.removeLast( );
 
-        Player player = new Player( nickName , color );
+        Player player = new Player( nickName , color, hashToken );
 
         return player;
     }

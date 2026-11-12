@@ -7,8 +7,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import pl.GabrielW.catan_server.api.dto.BoardDto;
 import pl.GabrielW.catan_server.api.dto.GameStateResponse;
+import pl.GabrielW.catan_server.api.dto.PlayerPublicDto;
 import pl.GabrielW.catan_server.gameEngine.Coordinate;
+import pl.GabrielW.catan_server.gameEngine.PlayerColor;
 import pl.GabrielW.catan_server.gameEngine.TurnPhase;
 import pl.GabrielW.catan_server.service.GameService;
 
@@ -35,7 +38,10 @@ class GameControllerTest {
     GameService gameService;
 
     private GameStateResponse sampleResponse( UUID id , TurnPhase phase ) {
-        return new GameStateResponse( id , phase , "G" , List.of( "G" , "W" ) );
+        PlayerPublicDto p1 = new PlayerPublicDto( "G" , 0 , 0 , 0 , 0 , 0 , 5 , 3 , 10 , PlayerColor.RED );
+        PlayerPublicDto p2 = new PlayerPublicDto( "W" , 0 , 0 , 0 , 0 , 0 , 5 , 3 , 10 , PlayerColor.BLUE );
+        BoardDto board = new BoardDto( 2 , List.of( ) , List.of( ) , List.of( ) );
+        return new GameStateResponse( id , phase , "G" , List.of( p1 , p2 ) , board , null , 0 , null );
     }
 
     @Test
@@ -50,7 +56,7 @@ class GameControllerTest {
                                 {"playerNickNames":["G","W"]}
                                 """ ) )
                 .andExpect( status( ).isOk( ) )
-                .andExpect( jsonPath( "$.players[0]" ).value( "G" ) )
+                .andExpect( jsonPath( "$.publicPlayers[0].nickName" ).value( "G" ) )
                 .andExpect( jsonPath( "$.phase" ).value( "ROLL_PHASE" ) );
     }
 

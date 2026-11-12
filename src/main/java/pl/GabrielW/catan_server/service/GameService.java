@@ -1,10 +1,13 @@
 package pl.GabrielW.catan_server.service;
 
 import org.springframework.stereotype.Service;
+import pl.GabrielW.catan_server.AuthTokens;
 import pl.GabrielW.catan_server.api.dto.GameStateResponse;
+import pl.GabrielW.catan_server.api.dto.PlayerJoinGameResponse;
 import pl.GabrielW.catan_server.gameEngine.CardType;
 import pl.GabrielW.catan_server.gameEngine.Coordinate;
 import pl.GabrielW.catan_server.gameEngine.Game;
+import pl.GabrielW.catan_server.gameEngine.PlayerFactory;
 import pl.GabrielW.catan_server.model.Player;
 
 import java.util.*;
@@ -41,6 +44,22 @@ public class GameService {
         return GameStateResponse.from( game );
     }
 
+    public GameStateResponse getGame( UUID id , String myPlayerNickName ) {
+        Game game = findGameOrThrow( id );
+        return GameStateResponse.from( game , myPlayerNickName );
+    }
+
+    public PlayerJoinGameResponse joinGame( UUID gameId , String nickName ) {
+        Game game = findGameOrThrow( gameId );
+
+        String rawToken = AuthTokens.generateToken( );
+        String tokenHash = AuthTokens.hashToken( rawToken );
+
+        Player player = game.addPlayer( nickName , tokenHash );
+
+        return new PlayerJoinGameResponse( gameId , player.getId( ) , rawToken );
+    }
+
     public GameStateResponse rollDice( UUID id ) {
         Game game = findGameOrThrow( id );
         game.rollDice( );
@@ -60,10 +79,7 @@ public class GameService {
         return GameStateResponse.from( game );
     }
 
-    public GameStateResponse tradeCards( UUID id , HashMap< CardType, Integer > thisCards ,
-                                         HashMap< CardType, Integer > otherCards ,
-                                         String playerNickName
-    ) {
+    public GameStateResponse tradeCards( UUID id , HashMap< CardType, Integer > thisCards , HashMap< CardType, Integer > otherCards , String playerNickName ) {
         Game game = findGameOrThrow( id );
         game.trade( thisCards , otherCards , playerNickName );
         return GameStateResponse.from( game );
@@ -100,6 +116,4 @@ public class GameService {
 
         return GameStateResponse.from( game );
     }
-
-
 }

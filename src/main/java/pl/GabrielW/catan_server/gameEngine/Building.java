@@ -18,7 +18,7 @@ public class Building {
     public Building( HashSet< Coordinate > cords , Player player ) {
         Objects.requireNonNull( cords , "Coordinates can not be null" );
         Objects.requireNonNull( player , "Player can not be null" );
-        if( cords.size() != 3 ) {
+        if( cords.size( ) != 3 ) {
             throw new IllegalArgumentException( "Building Coordinates must be size 3" );
         }
         List< Coordinate > cordsList = new ArrayList<>( cords );
@@ -27,7 +27,7 @@ public class Building {
             Coordinate cordA = cordsList.get( i );
             Coordinate cordB = cordsList.get( ( i + 1 ) % 3 );
 
-            if( !Board.isNeighbour( cordA , cordB ) ) {
+            if( ! Board.isNeighbour( cordA , cordB ) ) {
                 throw new IllegalArgumentException( "wrong Coordinates of a Building - make sure they are adjacent" );
             }
         }
@@ -36,7 +36,7 @@ public class Building {
         this.player = player;
     }
 
-    public static HashMap< CardType, Integer > cost() {
+    public static HashMap< CardType, Integer > cost( ) {
         return new HashMap<>( Map.of(
                 CardType.WOOD , 1 ,
                 CardType.WHEAT , 1 ,
@@ -45,7 +45,8 @@ public class Building {
         ) );
     }
 
-    public static int points() {
+    public static int points( ) {
         return 1;
     }
+
 }

@@ -11,6 +11,8 @@ import java.util.*;
 @Getter
 @Setter
 public class Player {
+    private UUID id;
+    private String hashToken;
     private String nickName;
     private int points;
     private int longestRoadLength;
@@ -18,6 +20,7 @@ public class Player {
     private HashMap< CardType, Integer > cards;
     private int cardsCount;
     private HashMap< SpecialCardType, Integer > specialCards;
+    private int specialCardsCount; //TODO any functionality
     private int buildingsLeft;
     private int buildingUpgradesLeft;
     private int roadsLeft;
@@ -27,6 +30,12 @@ public class Player {
     }
 
     public Player( String nickName , PlayerColor color ) {
+        this( nickName , color , null );
+    }
+
+    public Player( String nickName , PlayerColor color, String hashToken ) {
+        this.id = UUID.randomUUID();
+        this.hashToken = hashToken;
         this.nickName = nickName;
         this.color = color;
         this.points = 0;
@@ -35,6 +44,7 @@ public class Player {
         this.cards = new HashMap< CardType, Integer >( );
         this.cardsCount = 0;
         this.specialCards = new HashMap<>( );
+        this.specialCardsCount = 0;
         this.buildingsLeft = 5;
         this.buildingUpgradesLeft = 3;
         this.roadsLeft = 10;

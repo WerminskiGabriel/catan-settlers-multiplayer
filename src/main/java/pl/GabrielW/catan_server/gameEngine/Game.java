@@ -36,9 +36,14 @@ public class Game {
      *
      * @param nickName
      */
-    public void addPlayer( String nickName ) {
-        Player player = this.playerFactory.createPlayer( nickName );
+    public Player addPlayer( String nickName ) {
+        return addPlayer( nickName , null );
+    }
+
+    public Player addPlayer( String nickName , String hashToken ) {
+        Player player = this.playerFactory.createPlayer( nickName , hashToken );
         players.add( player );
+        return player;
     }
 
     /**
@@ -55,7 +60,10 @@ public class Game {
      * @return
      */
     public Player getPlayer( String nickName ) {
-        return players.stream( ).filter( p -> p.getNickName( ).equals( nickName ) ).findFirst( ).orElseThrow( );
+        if( nickName == null ) {
+            return null;
+        }
+        return players.stream( ).filter( p -> p.getNickName( ).equals( nickName ) ).findFirst( ).orElse( null );
     }
 
     public void rollDice( ) {
