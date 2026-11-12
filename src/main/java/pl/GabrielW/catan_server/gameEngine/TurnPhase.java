@@ -8,4 +8,6 @@ public enum TurnPhase {
     STEAL_PHASE,
     GAME_OVER,
     START_MENU,
+    SETUP_BUILDING,
+    SETUP_ROAD
 }

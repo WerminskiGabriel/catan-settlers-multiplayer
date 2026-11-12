@@ -143,10 +143,17 @@ public class Game {
      * @return
      */
     public boolean buildRoad( HashSet< Coordinate > newB ) {
-        if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
+        if( turnPhase != TurnPhase.TRADE_AND_BUILD && turnPhase != TurnPhase.SETUP_ROAD ) {
             throw new IllegalStateException( "Wrong turnPhase" );
         }
-        return board.placeRoad( newB , currentPlayer );
+        if( TurnPhase.SETUP_ROAD == turnPhase ) {
+            boolean placed = board.placeRoad( newB , currentPlayer , true );
+            if( placed ) {
+                turnPhase = TurnPhase.SETUP_BUILDING;
+            }
+            return placed;
+        }
+        return board.placeRoad( newB , currentPlayer , false );
     }
 
     /**
@@ -155,12 +162,25 @@ public class Game {
      * @return
      */
     public boolean buildBuilding( HashSet< Coordinate > newB ) {
-        if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
+        if( turnPhase != TurnPhase.TRADE_AND_BUILD && turnPhase != TurnPhase.SETUP_BUILDING ) {
             throw new IllegalStateException( "Wrong turnPhase" );
         }
-
-        boolean isSetup = turnNumber < players.size( ) * 2;
-        return board.placeBuilding( newB , currentPlayer , isSetup );
+        if( TurnPhase.SETUP_BUILDING == turnPhase ) {
+            boolean placed = board.placeBuilding( newB , currentPlayer , true );
+            if( placed ) {
+                turnPhase = TurnPhase.SETUP_ROAD;
+                if( turnNumber >= players.size( ) && turnNumber < 2 * players.size( ) ) {
+                    for( Coordinate coord : newB ) {
+                        CardType resource = board.coordinateToCardTypes( coord );
+                        if( resource != null && resource != CardType.DESERT && resource != CardType.OCEAN ) {
+                            currentPlayer.addCard( resource );
+                        }
+                    }
+                }
+            }
+            return placed;
+        }
+        return board.placeBuilding( newB , currentPlayer , false );
     }
 
     /**
@@ -238,13 +258,21 @@ public class Game {
 
 
     public void endTurn( ) {
-        if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
+        if( turnPhase != TurnPhase.TRADE_AND_BUILD && turnPhase != TurnPhase.SETUP_BUILDING ) {
             throw new IllegalStateException( "Wrong turnPhase" );
         }
         turnNumber += 1;
-        currentPlayer = players.get( turnNumber % players.size( ) );
 
-        turnPhase = TurnPhase.ROLL_PHASE;
+        if( turnNumber < 2 * players.size( ) ) {
+            if( turnNumber >= players.size( ) ) {
+                currentPlayer = players.get( players.size( ) - 1 - ( turnNumber % players.size( ) ) );
+            } else {
+                currentPlayer = players.get( turnNumber % players.size( ) );
+            }
+        } else {
+            currentPlayer = players.get( turnNumber % players.size( ) );
+            turnPhase = TurnPhase.ROLL_PHASE;
+        }
     }
 
     public void startGame( ) {
@@ -255,7 +283,7 @@ public class Game {
             throw new IllegalStateException( "Wrong turnPhase" );
         }
 
-        turnPhase = TurnPhase.ROLL_PHASE;
+        turnPhase = TurnPhase.SETUP_BUILDING;
         currentPlayer = players.get( 0 );
     }
 

@@ -111,15 +111,26 @@ public class Board {
     }
 
     public boolean placeRoad( HashSet< Coordinate > cords , Player player ) {
-        if( ! ( canAffordRoad( player ) && isRoadPlaceValid( cords , player ) ) ) {
+        return placeRoad( cords , player , false );
+    }
+
+    public boolean placeRoad( HashSet< Coordinate > cords , Player player , boolean isSetup ) {
+        if( ! isRoadPlaceValid( cords , player ) ) {
             return false;
         }
+
+        if( ! isSetup ) {
+            if( ! canAffordRoad( player ) ) {
+                return false;
+            }
+            player.removeCards( Road.cost( ) );
+        }
+
         Road road = new Road( cords , player );
         for( Coordinate coordinate : cords ) {
             roads.computeIfAbsent( coordinate , k -> new ArrayList<>( ) ).add( road );
         }
 
-        player.removeCards( Road.cost( ) );
         return true;
     }
 
@@ -214,18 +225,27 @@ public class Board {
     }
 
     public boolean placeBuilding( HashSet< Coordinate > cords , Player player , boolean isSetup ) {
-        if( ! isSetup && ! doBuldingConnectToRoad( cords , player ) ) {
+
+        if( ! isBuildingPlaceValid( cords , player ) ) {
             return false;
         }
-        if( ! ( canAffordBuilding( player ) && isBuildingPlaceValid( cords , player ) ) ) {
-            return false;
+
+        if( ! isSetup ) {
+            if( ! canAffordBuilding( player ) ) {
+                return false;
+            }
+            if( ! doBuldingConnectToRoad( cords , player ) ) {
+                return false;
+            }
+            player.removeCards( Building.cost( ) );
         }
+
+
         Building building = new Building( cords , player );
         for( Coordinate coordinate : cords ) {
             buildings.computeIfAbsent( coordinate , k -> new ArrayList<>( ) ).add( building );
         }
 
-        player.removeCards( Building.cost( ) );
         return true;
     }
 

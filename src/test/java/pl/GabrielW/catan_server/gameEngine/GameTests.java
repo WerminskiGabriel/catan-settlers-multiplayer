@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GameTests {
 
@@ -53,14 +54,14 @@ public class GameTests {
         game.addPlayer( "P2" );
 
         game.startGame( );
-        assertEquals( TurnPhase.ROLL_PHASE , game.getTurnPhase( ) );
+        assertEquals( TurnPhase.SETUP_BUILDING , game.getTurnPhase( ) );
     }
 
     @Test
     public void startGameSetsRollPhase( ) {
         Game game = startGameDefault( );
 
-        assertEquals( TurnPhase.ROLL_PHASE , game.getTurnPhase( ) );
+        assertEquals( TurnPhase.SETUP_BUILDING , game.getTurnPhase( ) );
         assertEquals( 0 , game.getTurnNumber( ) );
     }
 
@@ -134,8 +135,8 @@ public class GameTests {
         game.setTurnPhase( TurnPhase.TRADE_AND_BUILD );
         game.startGame( );
         assertSame( players.get( 0 ) , game.getCurrentPlayer( ) );
-        assertEquals( 0, game.getTurnNumber( ) );
-        assertEquals( TurnPhase.ROLL_PHASE , game.getTurnPhase( ) );
+        assertEquals( 0 , game.getTurnNumber( ) );
+        assertEquals( TurnPhase.SETUP_BUILDING , game.getTurnPhase( ) );
 
         game.setTurnPhase( TurnPhase.TRADE_AND_BUILD );
         game.endTurn( );
@@ -146,10 +147,27 @@ public class GameTests {
         game.endTurn( );
         assertSame( players.get( 2 ) , game.getCurrentPlayer( ) );
 
+        // Turn 3: Round 2 begins in reverse order (Snake draft) -> P3 (index 2) again
         game.setTurnPhase( TurnPhase.TRADE_AND_BUILD );
         game.endTurn( );
-        assertSame( players.get( 0 ) , game.getCurrentPlayer( ) ,
-                "with 3P the rotation should cycle back to the P1" );
+        assertSame( players.get( 2 ) , game.getCurrentPlayer( ) ,
+                "with snake draft P3 starts round 2" );
+
+        // Turn 4: P2 (index 1)
+        game.setTurnPhase( TurnPhase.TRADE_AND_BUILD );
+        game.endTurn( );
+        assertSame( players.get( 1 ) , game.getCurrentPlayer( ) );
+
+        // Turn 5: P1 (index 0)
+        game.setTurnPhase( TurnPhase.TRADE_AND_BUILD );
+        game.endTurn( );
+        assertSame( players.get( 0 ) , game.getCurrentPlayer( ) );
+
+        // Turn 6: Setup complete! Regular turn begins with P1 (index 0) in ROLL_PHASE
+        game.setTurnPhase( TurnPhase.TRADE_AND_BUILD );
+        game.endTurn( );
+        assertSame( players.get( 0 ) , game.getCurrentPlayer( ) );
+        assertEquals( TurnPhase.ROLL_PHASE , game.getTurnPhase( ) );
     }
 
     @Test
@@ -199,5 +217,34 @@ public class GameTests {
 
         assertThrows( IllegalStateException.class ,
                 ( ) -> game.trade( new java.util.HashMap<>( ) , new java.util.HashMap<>( ) , other ) );
+    }
+
+    @Test
+    public void secondSettlementInSetupGrantsStartingResources( ) {
+        Game game = startGameDefault( );
+        Player p1 = game.getCurrentPlayer( );
+        assertEquals( 0 , p1.getCardsCount( ) );
+
+        HashSet< Coordinate > spot1 = new HashSet<>( List.of(
+                new Coordinate( 0 , 0 ) ,
+                new Coordinate( 1 , 0 ) ,
+                new Coordinate( 0 , 1 )
+        ) );
+
+        // Round 1 (turn 0): First settlement gives 0 cards
+        game.buildBuilding( spot1 );
+        assertEquals( 0 , p1.getCardsCount( ) , "First settlement in setup must not grant resources" );
+
+        // Simulate advancing to round 2 (e.g. turnNumber = 3)
+        game.setTurnNumber( 3 );
+        game.setTurnPhase( TurnPhase.SETUP_BUILDING );
+        HashSet< Coordinate > spot2 = new HashSet<>( List.of(
+                new Coordinate( -1 , 0 ) ,
+                new Coordinate( -1 , 1 ) ,
+                new Coordinate( 0 , 0 )
+        ) );
+
+        game.buildBuilding( spot2 );
+        assertTrue( p1.getCardsCount( ) > 0 , "Second settlement in setup must grant starting resources from adjacent hexes" );
     }
 }
