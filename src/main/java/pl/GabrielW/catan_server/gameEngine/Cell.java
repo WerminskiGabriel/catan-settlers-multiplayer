@@ -11,7 +11,7 @@ public class Cell {
     private CardType cellType;
     private int diceNumber;
 
-    public Cell() { }
+    public Cell( ) { }
 
     public Cell( CardType celltype , int diceNumber ) {
         this.cellType = celltype;

@@ -58,22 +58,13 @@ public class BoardTests {
     @Test
     void everyTokenCount( ) {
         Board board = new Board( );
-        HashMap< Integer, Integer > correctTokensCount = new HashMap<>( Map.of(
-                2 , 1 ,
-                3 , 2 ,
-                4 , 2 ,
-                5 , 2 ,
-                6 , 2 ,
-                8 , 2 ,
-                9 , 2 ,
-                10 , 2 ,
-                11 , 2 ,
-                12 , 1
-        ) );
+        HashMap< Integer, Integer > correctTokensCount = new HashMap<>(
+                Map.of( 2 , 1 , 3 , 2 , 4 , 2 , 5 , 2 , 6 , 2 , 8 , 2 , 9 , 2 , 10 , 2 , 11 , 2 , 12 , 1 ) );
 
         int tokensCount = 0;
         board.getTokens( ).forEach( ( k , v ) -> {
-            assertTrue( v.size( ) == correctTokensCount.get( k ) , "Count of token(" + k + ") should be " + correctTokensCount.get( k ) + "." );
+            assertEquals( v.size( ) , ( int ) correctTokensCount.get( k ) ,
+                    "Count of token(" + k + ") should be " + correctTokensCount.get( k ) + "." );
         } );
     }
 
@@ -85,8 +76,10 @@ public class BoardTests {
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
         Player playerA = pFactory.createPlayer( "Appa" );
-        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
-        HashSet< Coordinate > roadFromBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+        HashSet< Coordinate > buildingA = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > roadFromBuilding = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) ) );
 
         playerA.addCards( Building.cost( ) );
         assertTrue( board.canAffordBuilding( playerA ) );
@@ -137,7 +130,8 @@ public class BoardTests {
         board.getCells( ).forEach( ( cord , cell ) -> {
             CardType type = cell.getCellType( );
             if( type == CardType.OCEAN ) {
-                int distance = Math.max( Math.abs( cord.q( ) ) , Math.max( Math.abs( cord.r( ) ) , Math.abs( cord.q( ) + cord.r( ) ) ) );
+                int distance = Math.max( Math.abs( cord.q( ) ) ,
+                        Math.max( Math.abs( cord.r( ) ) , Math.abs( cord.q( ) + cord.r( ) ) ) );
                 assertTrue( distance >= 2 );
             }
         } );
@@ -150,18 +144,20 @@ public class BoardTests {
         Coordinate middleCell = new Coordinate( 0 , 0 );
         Player playerA = pFactory.createPlayer( "Appa" );
 
-        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > buildingA = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
         playerA.addCards( Building.cost( ) );
         assertTrue( board.canAffordBuilding( playerA ) );
         board.placeBuilding( buildingA , playerA , true );
 
-        assertEquals( true , board.isVertexOccupied( buildingA ) , "this Vertex should be occupied - true" );
+        assertTrue( board.isVertexOccupied( buildingA ) , "this Vertex should be occupied - true" );
 
         for( Coordinate c : buildingA ) {
             boolean found = false;
             for( Building b : board.coordinateToBuildings( c ) ) {
                 if( b.getCoordinates( ).equals( buildingA ) ) {
                     found = true;
+                    break;
                 }
             }
             assertTrue( found );
@@ -185,7 +181,8 @@ public class BoardTests {
 
         HashSet< Coordinate > validRoad = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
         HashSet< Coordinate > invalidRoad1 = new HashSet<>( List.of( middleCell ) );
-        HashSet< Coordinate > invalidRoad3 = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.WEST ) ) );
+        HashSet< Coordinate > invalidRoad3 = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.WEST ) ) );
 
         assertDoesNotThrow( ( ) -> new Road( validRoad , playerA ) );
         assertThrows( IllegalArgumentException.class , ( ) -> new Road( invalidRoad1 , playerA ) );
@@ -200,8 +197,10 @@ public class BoardTests {
         Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        HashSet< Coordinate > validBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
-        HashSet< Coordinate > invalidBuilding2 = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+        HashSet< Coordinate > validBuilding = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > invalidBuilding2 = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) ) );
 
         assertDoesNotThrow( ( ) -> new Building( validBuilding , playerA ) );
         assertThrows( IllegalArgumentException.class , ( ) -> new Building( invalidBuilding2 , playerA ) );
@@ -225,7 +224,8 @@ public class BoardTests {
         Board board = new Board( );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        HashSet< Coordinate > buildingCords = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > buildingCords = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
         List< HashSet< Coordinate > > roads = board.roadsFromBuildingCoordinates( buildingCords );
 
         assertEquals( 3 , roads.size( ) );
@@ -233,7 +233,8 @@ public class BoardTests {
             assertEquals( 2 , road.size( ) );
         }
 
-        HashSet< Coordinate > invalidCoords = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+        HashSet< Coordinate > invalidCoords = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) ) );
         assertThrows( IllegalArgumentException.class , ( ) -> board.roadsFromBuildingCoordinates( invalidCoords ) );
     }
 
@@ -245,7 +246,8 @@ public class BoardTests {
         Player playerB = pFactory.createPlayer( "Momo" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        HashSet< Coordinate > vertex1 = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > vertex1 = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
 
         assertTrue( board.isBuildingPlaceValid( vertex1 , playerA ) );
         playerA.addCards( Building.cost( ) );
@@ -254,10 +256,13 @@ public class BoardTests {
 
         assertFalse( board.isBuildingPlaceValid( vertex1 , playerB ) );
 
-        HashSet< Coordinate > adjacentVertexTooClose = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.NORTH_EAST ) ) );
+        HashSet< Coordinate > adjacentVertexTooClose = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.NORTH_EAST ) ) );
         assertFalse( board.isBuildingPlaceValid( adjacentVertexTooClose , playerB ) );
 
-        HashSet< Coordinate > safeVertex = new HashSet<>( List.of( middleCell.move( Direction.EAST ) , middleCell.move( Direction.EAST ).move( Direction.EAST ) , middleCell.move( Direction.EAST ).move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > safeVertex = new HashSet<>(
+                List.of( middleCell.move( Direction.EAST ) , middleCell.move( Direction.EAST ).move( Direction.EAST ) ,
+                        middleCell.move( Direction.EAST ).move( Direction.SOUTH_EAST ) ) );
         assertTrue( board.isBuildingPlaceValid( safeVertex , playerB ) );
     }
 
@@ -269,10 +274,13 @@ public class BoardTests {
         Player playerB = pFactory.createPlayer( "Momo" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        HashSet< Coordinate > building = new HashSet<>( Set.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > building = new HashSet<>(
+                Set.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
         HashSet< Coordinate > road1 = new HashSet<>( Set.of( middleCell , middleCell.move( Direction.EAST ) ) );
-        HashSet< Coordinate > road2Connected = new HashSet<>( Set.of( middleCell , middleCell.move( Direction.SOUTH_EAST ) ) );
-        HashSet< Coordinate > road3Disconnected = new HashSet<>( Set.of( middleCell.move( Direction.WEST ) , middleCell.move( Direction.SOUTH_WEST ) ) );
+        HashSet< Coordinate > road2Connected = new HashSet<>(
+                Set.of( middleCell , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > road3Disconnected = new HashSet<>(
+                Set.of( middleCell.move( Direction.WEST ) , middleCell.move( Direction.SOUTH_WEST ) ) );
 
         playerA.addCards( Building.cost( ) );
         assertTrue( board.canAffordBuilding( playerA ) );
@@ -297,7 +305,8 @@ public class BoardTests {
         Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > buildingA = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
 
         playerA.addCards( Building.cost( ) );
         assertTrue( board.placeBuilding( buildingA , playerA , true ) , "setup building should work without road" );
@@ -311,7 +320,8 @@ public class BoardTests {
         Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > buildingA = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
 
         playerA.addCards( Building.cost( ) );
         assertFalse( board.placeBuilding( buildingA , playerA , false ) , "main building without road should fail" );
@@ -325,13 +335,16 @@ public class BoardTests {
         Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
-        HashSet< Coordinate > roadFromBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+        HashSet< Coordinate > buildingA = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > roadFromBuilding = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) ) );
 
         playerA.addCards( Building.cost( ) );
         board.placeBuilding( buildingA , playerA , true );
 
-        assertTrue( board.doRoadConnectToBuilding( roadFromBuilding , playerA ) , "road touching own building should connect" );
+        assertTrue( board.doRoadConnectToBuilding( roadFromBuilding , playerA ) ,
+                "road touching own building should connect" );
     }
 
     @Test
@@ -341,15 +354,19 @@ public class BoardTests {
         Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
-        HashSet< Coordinate > roadFromBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+        HashSet< Coordinate > buildingA = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > roadFromBuilding = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) ) );
 
         playerA.addCards( Building.cost( ) );
         board.placeBuilding( buildingA , playerA , true );
 
         playerA.addCards( Road.cost( ) );
-        assertTrue( board.isRoadPlaceValid( roadFromBuilding , playerA ) , "first road from own settlement should be valid" );
-        assertTrue( board.placeRoad( roadFromBuilding , playerA , false ) , "first road from own settlement should place" );
+        assertTrue( board.isRoadPlaceValid( roadFromBuilding , playerA ) ,
+                "first road from own settlement should be valid" );
+        assertTrue( board.placeRoad( roadFromBuilding , playerA , false ) ,
+                "first road from own settlement should place" );
     }
 
     @Test
@@ -359,8 +376,10 @@ public class BoardTests {
         Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
-        HashSet< Coordinate > roadFromBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+        HashSet< Coordinate > buildingA = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > roadFromBuilding = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) ) );
 
         assertTrue( board.placeBuilding( buildingA , playerA , true ) );
 
@@ -377,8 +396,10 @@ public class BoardTests {
         Player playerA = pFactory.createPlayer( "Appa" );
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        HashSet< Coordinate > buildingA = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
-        HashSet< Coordinate > roadFromBuilding = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+        HashSet< Coordinate > buildingA = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        HashSet< Coordinate > roadFromBuilding = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) ) );
 
         playerA.addCards( Building.cost( ) );
         board.placeBuilding( buildingA , playerA , true );
@@ -411,7 +432,8 @@ public class BoardTests {
         HashSet< Coordinate > lonelyRoad = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
 
         playerA.addCards( Road.cost( ) );
-        assertFalse( board.isRoadPlaceValid( lonelyRoad , playerA ) , "road without building or network should be invalid" );
+        assertFalse( board.isRoadPlaceValid( lonelyRoad , playerA ) ,
+                "road without building or network should be invalid" );
     }
 
     @Test

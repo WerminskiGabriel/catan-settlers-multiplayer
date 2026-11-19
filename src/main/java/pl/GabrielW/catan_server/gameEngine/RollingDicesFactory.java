@@ -8,16 +8,16 @@ import java.util.Random;
 public class RollingDicesFactory {
     // 2 rolling Dices
 
+    private final Random rnd;
     private int dice1;
     private int dice2;
     private int sum;
-    private final Random rnd;
 
-    public RollingDicesFactory() {
-        this.rnd = new Random();
+    public RollingDicesFactory( ) {
+        this.rnd = new Random( );
     }
 
-    public void roll() {
+    public void roll( ) {
 
         this.dice1 = rnd.nextInt( 1 , 7 );
         this.dice2 = rnd.nextInt( 1 , 7 );

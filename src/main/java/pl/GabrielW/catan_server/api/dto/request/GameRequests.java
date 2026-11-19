@@ -10,31 +10,14 @@ public final class GameRequests {
 
     private GameRequests( ) { }
 
-    public record BuildRequest(
-            Set< Coordinate > coordinates
-    ) {
-    }
+    public record BuildRequest( Set< Coordinate > coordinates ) { }
 
-    public record PlaceRobberRequest(
-            Coordinate coordinate
-    ) {
-    }
+    public record PlaceRobberRequest( Coordinate coordinate ) { }
 
-    public record StealRequest(
-            String victimNickName
-    ) {
-    }
+    public record StealRequest( String victimNickName ) { }
 
-    public record TradeRequest(
-            Map< CardType, Integer > thisCards ,
-            Map< CardType, Integer > otherCards ,
-            String otherPlayerNickName
-    ) {
-    }
+    public record TradeRequest( Map< CardType, Integer > thisCards , Map< CardType, Integer > otherCards ,
+                                String otherPlayerNickName ) { }
 
-    public record BankTradeRequest(
-            CardType give ,
-            CardType receive
-    ) {
-    }
+    public record BankTradeRequest( CardType give , CardType receive ) { }
 }

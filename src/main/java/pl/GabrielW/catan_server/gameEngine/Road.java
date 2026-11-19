@@ -5,7 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 import pl.GabrielW.catan_server.model.Player;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -17,7 +20,7 @@ public class Road {
     public Road( HashSet< Coordinate > cords , Player player ) {
         Objects.requireNonNull( cords , "Coordinates can not be null" );
         Objects.requireNonNull( player , "Player can not be null" );
-        if( cords.size() != 2 ) {
+        if( cords.size( ) != 2 ) {
             throw new IllegalArgumentException( "Road Coordinates must be size 2" );
         }
 
@@ -25,11 +28,8 @@ public class Road {
         this.player = player;
     }
 
-    public static HashMap< CardType, Integer > cost() {
-        return new HashMap<>( Map.of(
-                CardType.WOOD , 1 ,
-                CardType.BRICK , 1
-        ) );
+    public static HashMap< CardType, Integer > cost( ) {
+        return new HashMap<>( Map.of( CardType.WOOD , 1 , CardType.BRICK , 1 ) );
     }
 
 }

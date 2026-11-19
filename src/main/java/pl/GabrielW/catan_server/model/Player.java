@@ -1,7 +1,7 @@
 package pl.GabrielW.catan_server.model;
 
-import lombok.Setter;
 import lombok.Getter;
+import lombok.Setter;
 import pl.GabrielW.catan_server.gameEngine.CardType;
 import pl.GabrielW.catan_server.gameEngine.PlayerColor;
 import pl.GabrielW.catan_server.gameEngine.SpecialCardType;
@@ -33,8 +33,8 @@ public class Player {
         this( nickName , color , null );
     }
 
-    public Player( String nickName , PlayerColor color, String hashToken ) {
-        this.id = UUID.randomUUID();
+    public Player( String nickName , PlayerColor color , String hashToken ) {
+        this.id = UUID.randomUUID( );
         this.hashToken = hashToken;
         this.nickName = nickName;
         this.color = color;

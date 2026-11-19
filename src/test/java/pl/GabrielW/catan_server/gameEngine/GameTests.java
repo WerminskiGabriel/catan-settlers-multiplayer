@@ -1,6 +1,5 @@
 package pl.GabrielW.catan_server.gameEngine;
 
-import org.hamcrest.core.IsInstanceOf;
 import org.junit.jupiter.api.Test;
 import pl.GabrielW.catan_server.model.Player;
 
@@ -78,11 +77,8 @@ public class GameTests {
         game.rollDice( );
 
         assertNotEquals( TurnPhase.ROLL_PHASE , game.getTurnPhase( ) );
-        boolean landedInExpectedPhase =
-                game.getTurnPhase( ) == TurnPhase.TRADE_AND_BUILD
-                        || game.getTurnPhase( ) == TurnPhase.DISCARD_PHASE;
-        assertEquals( true , landedInExpectedPhase ,
-                "dice_roll -> TRADE_AND_BUILD or DISCARD_PHASE" );
+        boolean landedInExpectedPhase = game.getTurnPhase( ) == TurnPhase.TRADE_AND_BUILD || game.getTurnPhase( ) == TurnPhase.DISCARD_PHASE;
+        assertTrue( landedInExpectedPhase , "dice_roll -> TRADE_AND_BUILD or DISCARD_PHASE" );
     }
 
     @Test
@@ -90,10 +86,9 @@ public class GameTests {
         Game game = startGameDefault( );
         game.setTurnPhase( TurnPhase.ROLL_PHASE );
 
-        HashSet< Coordinate > road = new HashSet<>( List.of(
-                new Coordinate( 0 , 0 ) , new Coordinate( 1 , 0 ) ) );
-        HashSet< Coordinate > building = new HashSet<>( List.of(
-                new Coordinate( 0 , 0 ) , new Coordinate( 1 , 0 ) , new Coordinate( 0 , 1 ) ) );
+        HashSet< Coordinate > road = new HashSet<>( List.of( new Coordinate( 0 , 0 ) , new Coordinate( 1 , 0 ) ) );
+        HashSet< Coordinate > building = new HashSet<>(
+                List.of( new Coordinate( 0 , 0 ) , new Coordinate( 1 , 0 ) , new Coordinate( 0 , 1 ) ) );
 
         assertThrows( IllegalStateException.class , ( ) -> game.buildRoad( road ) );
         assertThrows( IllegalStateException.class , ( ) -> game.buildBuilding( building ) );
@@ -112,8 +107,7 @@ public class GameTests {
         Game game = startGameDefault( );
         game.setTurnPhase( TurnPhase.ROLL_PHASE );
 
-        assertThrows( IllegalStateException.class ,
-                ( ) -> game.placeRobber( new Coordinate( 0 , 0 ) ) );
+        assertThrows( IllegalStateException.class , ( ) -> game.placeRobber( new Coordinate( 0 , 0 ) ) );
     }
 
     @Test
@@ -147,8 +141,7 @@ public class GameTests {
         // Turn 3: Round 2 begins in reverse order (Snake draft) -> P3 (index 2) again
         game.setTurnPhase( TurnPhase.TRADE_AND_BUILD );
         game.endTurn( );
-        assertSame( players.get( 2 ) , game.getCurrentPlayer( ) ,
-                "with snake draft P3 starts round 2" );
+        assertSame( players.get( 2 ) , game.getCurrentPlayer( ) , "with snake draft P3 starts round 2" );
 
         // Turn 4: P2 (index 1)
         game.setTurnPhase( TurnPhase.TRADE_AND_BUILD );
@@ -222,11 +215,8 @@ public class GameTests {
         Player p1 = game.getCurrentPlayer( );
         assertEquals( 0 , p1.getCardsCount( ) );
 
-        HashSet< Coordinate > spot1 = new HashSet<>( List.of(
-                new Coordinate( 0 , 0 ) ,
-                new Coordinate( 1 , 0 ) ,
-                new Coordinate( 0 , 1 )
-        ) );
+        HashSet< Coordinate > spot1 = new HashSet<>(
+                List.of( new Coordinate( 0 , 0 ) , new Coordinate( 1 , 0 ) , new Coordinate( 0 , 1 ) ) );
 
         // Round 1 (turn 0): First settlement gives 0 cards
         game.buildBuilding( spot1 );
@@ -235,14 +225,12 @@ public class GameTests {
         // Simulate advancing to round 2 (e.g. turnNumber = 3)
         game.setTurnNumber( 3 );
         game.setTurnPhase( TurnPhase.SETUP_BUILDING );
-        HashSet< Coordinate > spot2 = new HashSet<>( List.of(
-                new Coordinate( - 1 , 0 ) ,
-                new Coordinate( - 1 , 1 ) ,
-                new Coordinate( 0 , 0 )
-        ) );
+        HashSet< Coordinate > spot2 = new HashSet<>(
+                List.of( new Coordinate( - 1 , 0 ) , new Coordinate( - 1 , 1 ) , new Coordinate( 0 , 0 ) ) );
 
         game.buildBuilding( spot2 );
-        assertTrue( p1.getCardsCount( ) > 0 , "Second settlement in setup must grant starting resources from adjacent hexes" );
+        assertTrue( p1.getCardsCount( ) > 0 ,
+                "Second settlement in setup must grant starting resources from adjacent hexes" );
     }
 
     @Test

@@ -1,7 +1,5 @@
 package pl.GabrielW.catan_server.gameEngine;
 
-import lombok.Getter;
-
 
 public record Coordinate( int q , int r ) {
 

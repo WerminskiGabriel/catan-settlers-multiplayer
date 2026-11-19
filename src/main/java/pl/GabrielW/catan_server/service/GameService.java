@@ -65,9 +65,10 @@ public class GameService {
         return GameStateResponse.from( game );
     }
 
-    public GameStateResponse discardCards( UUID id, String playerNickName, HashMap<CardType,Integer> cardsToDiscard ) {
+    public GameStateResponse discardCards( UUID id , String playerNickName ,
+                                           HashMap< CardType, Integer > cardsToDiscard ) {
         Game game = findGameOrThrow( id );
-        game.discardCardsOnePlayer( playerNickName, cardsToDiscard );
+        game.discardCardsOnePlayer( playerNickName , cardsToDiscard );
         return GameStateResponse.from( game );
     }
 
@@ -77,7 +78,8 @@ public class GameService {
         return GameStateResponse.from( game );
     }
 
-    public GameStateResponse tradeCards( UUID id , HashMap< CardType, Integer > thisCards , HashMap< CardType, Integer > otherCards , String playerNickName ) {
+    public GameStateResponse tradeCards( UUID id , HashMap< CardType, Integer > thisCards ,
+                                         HashMap< CardType, Integer > otherCards , String playerNickName ) {
         Game game = findGameOrThrow( id );
         game.trade( thisCards , otherCards , playerNickName );
         return GameStateResponse.from( game );

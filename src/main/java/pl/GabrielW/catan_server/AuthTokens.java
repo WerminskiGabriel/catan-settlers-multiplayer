@@ -22,7 +22,8 @@ public final class AuthTokens {
             MessageDigest digest = MessageDigest.getInstance( "SHA-256" );
             byte[] hashBytes = digest.digest( rawToken.getBytes( StandardCharsets.UTF_8 ) );
             return HexFormat.of( ).formatHex( hashBytes );
-        } catch( NoSuchAlgorithmException e ) {
+        }
+        catch( NoSuchAlgorithmException e ) {
             throw new IllegalStateException( "SHA-256 not available" , e );
         }
     }
@@ -32,9 +33,7 @@ public final class AuthTokens {
             return false;
         }
         String computedHash = hashToken( rawToken );
-        return MessageDigest.isEqual(
-                computedHash.getBytes( StandardCharsets.UTF_8 ) ,
-                storedHashedToken.getBytes( StandardCharsets.UTF_8 )
-        );
+        return MessageDigest.isEqual( computedHash.getBytes( StandardCharsets.UTF_8 ) ,
+                storedHashedToken.getBytes( StandardCharsets.UTF_8 ) );
     }
 }

@@ -12,20 +12,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class BuildingTests {
 
     @Test
-    public void buildingInit() {
-        PlayerFactory playerFactory = new PlayerFactory();
+    public void buildingInit( ) {
+        PlayerFactory playerFactory = new PlayerFactory( );
         Player player = playerFactory.createPlayer( "Aang" );
 
         Coordinate middleCell = new Coordinate( 0 , 0 );
 
-        HashSet< Coordinate > cordsCorrect = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
-        assertDoesNotThrow( () -> new Building( cordsCorrect , player ) , "Correct Coordinates should not throw errors " );
+        HashSet< Coordinate > cordsCorrect = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.SOUTH_EAST ) ) );
+        assertDoesNotThrow( ( ) -> new Building( cordsCorrect , player ) ,
+                "Correct Coordinates should not throw errors " );
 
-        HashSet< Coordinate > cordsIncorrect = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.WEST ) ) );
-        assertThrows( IllegalArgumentException.class , () -> new Building( cordsIncorrect , player ) , "incorrect not adjacent should Coordinates throw Exception" );
+        HashSet< Coordinate > cordsIncorrect = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) , middleCell.move( Direction.WEST ) ) );
+        assertThrows( IllegalArgumentException.class , ( ) -> new Building( cordsIncorrect , player ) ,
+                "incorrect not adjacent should Coordinates throw Exception" );
 
-        HashSet< Coordinate > cordsIncorrectSize = new HashSet<>( List.of( middleCell , middleCell.move( Direction.EAST ) ) );
-        assertThrows( IllegalArgumentException.class , () -> new Building( cordsIncorrectSize , player ) , "incorrect not size 3  Coordinates should throw Exception" );
+        HashSet< Coordinate > cordsIncorrectSize = new HashSet<>(
+                List.of( middleCell , middleCell.move( Direction.EAST ) ) );
+        assertThrows( IllegalArgumentException.class , ( ) -> new Building( cordsIncorrectSize , player ) ,
+                "incorrect not size 3  Coordinates should throw Exception" );
 
     }
 }

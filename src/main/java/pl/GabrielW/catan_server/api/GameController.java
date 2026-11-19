@@ -45,41 +45,36 @@ public class GameController {
     }
 
     @PostMapping( "/{id}/discard" )
-    public ResponseEntity< GameStateResponse > discardCards( @PathVariable UUID id , @RequestBody DiscardRequest request ) {
+    public ResponseEntity< GameStateResponse > discardCards( @PathVariable UUID id ,
+                                                             @RequestBody DiscardRequest request ) {
         GameStateResponse response = gameService.discardCards( id , request.playerNickName( ) , request.cards( ) );
         return ResponseEntity.ok( response );
     }
 
     @PostMapping( "/{id}/build-road" )
-    public ResponseEntity< GameStateResponse > buildRoad(
-            @PathVariable UUID id ,
-            @RequestBody GameRequests.BuildRequest request
-    ) {
-        HashSet< pl.GabrielW.catan_server.gameEngine.Coordinate > coords =
-                request.coordinates( ) != null ? new HashSet<>( request.coordinates( ) ) : new HashSet<>( );
+    public ResponseEntity< GameStateResponse > buildRoad( @PathVariable UUID id ,
+                                                          @RequestBody GameRequests.BuildRequest request ) {
+        HashSet< pl.GabrielW.catan_server.gameEngine.Coordinate > coords = request.coordinates( ) != null ? new HashSet<>(
+                request.coordinates( ) ) : new HashSet<>( );
         GameStateResponse response = gameService.buildRoad( id , coords );
         return ResponseEntity.ok( response );
     }
 
     @PostMapping( "/{id}/build-settlement" )
-    public ResponseEntity< GameStateResponse > buildSettlement(
-            @PathVariable UUID id ,
-            @RequestBody GameRequests.BuildRequest request
-    ) {
-        HashSet< pl.GabrielW.catan_server.gameEngine.Coordinate > coords =
-                request.coordinates( ) != null ? new HashSet<>( request.coordinates( ) ) : new HashSet<>( );
+    public ResponseEntity< GameStateResponse > buildSettlement( @PathVariable UUID id ,
+                                                                @RequestBody GameRequests.BuildRequest request ) {
+        HashSet< pl.GabrielW.catan_server.gameEngine.Coordinate > coords = request.coordinates( ) != null ? new HashSet<>(
+                request.coordinates( ) ) : new HashSet<>( );
         GameStateResponse response = gameService.buildBuilding( id , coords );
         return ResponseEntity.ok( response );
     }
 
     @PostMapping( "/{id}/upgrade-settlement" )
-    public ResponseEntity< GameStateResponse > upgradeSettlement(
-            @PathVariable UUID id ,
-            @RequestBody GameRequests.BuildRequest request
-    ) {
+    public ResponseEntity< GameStateResponse > upgradeSettlement( @PathVariable UUID id ,
+                                                                  @RequestBody GameRequests.BuildRequest request ) {
 
-        HashSet< pl.GabrielW.catan_server.gameEngine.Coordinate > coords =
-                request.coordinates( ) != null ? new HashSet<>( request.coordinates( ) ) : new HashSet<>( );
+        HashSet< pl.GabrielW.catan_server.gameEngine.Coordinate > coords = request.coordinates( ) != null ? new HashSet<>(
+                request.coordinates( ) ) : new HashSet<>( );
 
         GameStateResponse response = gameService.upgradeBuilding( id , coords );
         return ResponseEntity.ok( response );
@@ -87,47 +82,35 @@ public class GameController {
 
 
     @PostMapping( "/{id}/place-robber" )
-    public ResponseEntity< GameStateResponse > placeRobber(
-            @PathVariable UUID id ,
-            @RequestBody GameRequests.PlaceRobberRequest request
-    ) {
+    public ResponseEntity< GameStateResponse > placeRobber( @PathVariable UUID id ,
+                                                            @RequestBody GameRequests.PlaceRobberRequest request ) {
         GameStateResponse response = gameService.placeRobber( id , request.coordinate( ) );
         return ResponseEntity.ok( response );
     }
 
     @PostMapping( "/{id}/steal" )
-    public ResponseEntity< GameStateResponse > stealCard(
-            @PathVariable UUID id ,
-            @RequestBody GameRequests.StealRequest request
-    ) {
+    public ResponseEntity< GameStateResponse > stealCard( @PathVariable UUID id ,
+                                                          @RequestBody GameRequests.StealRequest request ) {
         GameStateResponse response = gameService.stealCard( id , request.victimNickName( ) );
         return ResponseEntity.ok( response );
     }
 
     @PostMapping( "/{id}/trade" )
-    public ResponseEntity< GameStateResponse > trade(
-            @PathVariable UUID id ,
-            @RequestBody GameRequests.TradeRequest request
-    ) {
-        HashMap< pl.GabrielW.catan_server.gameEngine.CardType, Integer > thisCards =
-                request.thisCards( ) != null ? new HashMap<>( request.thisCards( ) ) : new HashMap<>( );
-        HashMap< pl.GabrielW.catan_server.gameEngine.CardType, Integer > otherCards =
-                request.otherCards( ) != null ? new HashMap<>( request.otherCards( ) ) : new HashMap<>( );
+    public ResponseEntity< GameStateResponse > trade( @PathVariable UUID id ,
+                                                      @RequestBody GameRequests.TradeRequest request ) {
+        HashMap< pl.GabrielW.catan_server.gameEngine.CardType, Integer > thisCards = request.thisCards( ) != null ? new HashMap<>(
+                request.thisCards( ) ) : new HashMap<>( );
+        HashMap< pl.GabrielW.catan_server.gameEngine.CardType, Integer > otherCards = request.otherCards( ) != null ? new HashMap<>(
+                request.otherCards( ) ) : new HashMap<>( );
 
-        GameStateResponse response = gameService.tradeCards(
-                id ,
-                thisCards ,
-                otherCards ,
-                request.otherPlayerNickName( )
-        );
+        GameStateResponse response = gameService.tradeCards( id , thisCards , otherCards ,
+                request.otherPlayerNickName( ) );
         return ResponseEntity.ok( response );
     }
 
     @PostMapping( "/{id}/bank-trade" )
-    public ResponseEntity< GameStateResponse > bankTrade(
-            @PathVariable UUID id ,
-            @RequestBody GameRequests.BankTradeRequest request
-    ) {
+    public ResponseEntity< GameStateResponse > bankTrade( @PathVariable UUID id ,
+                                                          @RequestBody GameRequests.BankTradeRequest request ) {
         GameStateResponse response = gameService.bankTrade( id , request.give( ) , request.receive( ) );
         return ResponseEntity.ok( response );
     }

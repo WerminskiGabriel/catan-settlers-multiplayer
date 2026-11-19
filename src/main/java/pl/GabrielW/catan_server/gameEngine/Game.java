@@ -12,12 +12,12 @@ public class Game {
     private final Board board;
     private final UUID id;
     private final ArrayList< Player > players;
-    private Player currentPlayer;
     private final PlayerFactory playerFactory;
-    private int turnNumber;
-    private TurnPhase turnPhase;
     private final RollingDicesFactory rollingDicesFactory;
     private final int limitMT; // cardLimit before discarding
+    private Player currentPlayer;
+    private int turnNumber;
+    private TurnPhase turnPhase;
     private Coordinate robberCord;
     private int winningPointsCondition;
 
@@ -111,7 +111,8 @@ public class Game {
      * @param otherCards
      * @param otherP
      */
-    public void trade( HashMap< CardType, Integer > thisCards , HashMap< CardType, Integer > otherCards , Player otherP ) {
+    public void trade( HashMap< CardType, Integer > thisCards , HashMap< CardType, Integer > otherCards ,
+                       Player otherP ) {
         if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
             throw new IllegalStateException( "Wrong turnPhase" );
         }
@@ -131,7 +132,8 @@ public class Game {
      * @param otherCards
      * @param otherPlayerNickName
      */
-    public void trade( HashMap< CardType, Integer > thisCards , HashMap< CardType, Integer > otherCards , String otherPlayerNickName ) {
+    public void trade( HashMap< CardType, Integer > thisCards , HashMap< CardType, Integer > otherCards ,
+                       String otherPlayerNickName ) {
         Player otherP = getPlayer( otherPlayerNickName );
         if( otherP == null ) {
             throw new IllegalArgumentException( "Player u want to trade with does not exist: " + otherPlayerNickName );
@@ -262,9 +264,7 @@ public class Game {
         }
 
         int expectedDiscardCount = player.getCardsCount( ) / 2;
-        int submittedDiscardCount = cardsToDiscard.values( ).stream( )
-                .mapToInt( Integer::intValue )
-                .sum( );
+        int submittedDiscardCount = cardsToDiscard.values( ).stream( ).mapToInt( Integer::intValue ).sum( );
 
         if( submittedDiscardCount != expectedDiscardCount ) {
             throw new IllegalArgumentException( "Player must discard exactly " + expectedDiscardCount + " cards" );
@@ -272,8 +272,7 @@ public class Game {
 
         player.removeCards( cardsToDiscard );
 
-        boolean anyPlayerStillNeedsToDiscard = players.stream( )
-                .anyMatch( p -> p.hasCardsAboveLimit( limitMT ) );
+        boolean anyPlayerStillNeedsToDiscard = players.stream( ).anyMatch( p -> p.hasCardsAboveLimit( limitMT ) );
 
         if( ! anyPlayerStillNeedsToDiscard ) {
             turnPhase = TurnPhase.ROBBER_PLACEMENT;
@@ -299,7 +298,8 @@ public class Game {
     public void stealCard( String stealFromPlayerNickName ) {
         Player stealFromP = getPlayer( stealFromPlayerNickName );
         if( stealFromP == null ) {
-            throw new IllegalArgumentException( "Player u want to steal from does not exist: " + stealFromPlayerNickName );
+            throw new IllegalArgumentException(
+                    "Player u want to steal from does not exist: " + stealFromPlayerNickName );
         }
         stealCard( stealFromP );
     }
@@ -318,8 +318,8 @@ public class Game {
 
         List< Building > buildingsOnRobber = board.getBuildingsAroundHex( robberCord );
         if( ! buildingsOnRobber.isEmpty( ) ) {
-            boolean victimHasBuilding = buildingsOnRobber.stream( )
-                    .anyMatch( b -> b.getPlayer( ).equals( stealFromP ) );
+            boolean victimHasBuilding = buildingsOnRobber.stream( ).anyMatch(
+                    b -> b.getPlayer( ).equals( stealFromP ) );
             if( ! victimHasBuilding ) {
                 throw new IllegalArgumentException( "Victim has no building adjacent to robber" );
             }
@@ -364,10 +364,10 @@ public class Game {
             Port port = entry.getValue( );
             Building building = board.findBuildingAt( vertex , player );
             if( building != null ) {
-                if( port.getResource( ) != null && port.getResource( ).equals( cardType ) ) {
+                if( port.resource( ) != null && port.resource( ).equals( cardType ) ) {
                     return 2;
                 }
-                if( port.getResource( ) == null ) {
+                if( port.resource( ) == null ) {
                     bestRatio = Math.min( bestRatio , 3 );
                 }
             }

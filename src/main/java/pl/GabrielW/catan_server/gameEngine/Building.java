@@ -37,6 +37,19 @@ public class Building {
         this.isCity = false;
     }
 
+    public static HashMap< CardType, Integer > cost( ) {
+        return new HashMap<>(
+                Map.of( CardType.WOOD , 1 , CardType.WHEAT , 1 , CardType.SHEEP , 1 , CardType.BRICK , 1 ) );
+    }
+
+    public static HashMap< CardType, Integer > cityCost( ) {
+        return new HashMap<>( Map.of( CardType.ORE , 3 , CardType.WHEAT , 2 ) );
+    }
+
+    public static int points( ) {
+        return 1;
+    }
+
     public void upgrade( ) {
         if( this.isCity ) {
             throw new IllegalStateException( "Building is already a city" );
@@ -46,26 +59,6 @@ public class Building {
 
     public int getPoints( ) {
         return isCity ? 2 : 1;
-    }
-
-    public static HashMap< CardType, Integer > cost( ) {
-        return new HashMap<>( Map.of(
-                CardType.WOOD , 1 ,
-                CardType.WHEAT , 1 ,
-                CardType.SHEEP , 1 ,
-                CardType.BRICK , 1
-        ) );
-    }
-
-    public static HashMap< CardType, Integer > cityCost( ) {
-        return new HashMap<>( Map.of(
-                CardType.ORE , 3 ,
-                CardType.WHEAT , 2
-        ) );
-    }
-
-    public static int points( ) {
-        return 1;
     }
 
 }
