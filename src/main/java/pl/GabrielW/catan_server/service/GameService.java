@@ -10,6 +10,7 @@ import pl.GabrielW.catan_server.gameEngine.Game;
 import pl.GabrielW.catan_server.gameEngine.PlayerFactory;
 import pl.GabrielW.catan_server.model.Player;
 
+import javax.swing.plaf.metal.MetalBorders;
 import java.util.*;
 
 @Service
@@ -66,10 +67,9 @@ public class GameService {
         return GameStateResponse.from( game );
     }
 
-    public GameStateResponse discardCards( UUID id ) {
+    public GameStateResponse discardCards( UUID id, String playerNickName, HashMap<CardType,Integer> cardsToDiscard ) {
         Game game = findGameOrThrow( id );
-
-        game.discardCards( ); //TODO random cards to discard?
+        game.discardCardsOnePlayer( playerNickName, cardsToDiscard );
         return GameStateResponse.from( game );
     }
 

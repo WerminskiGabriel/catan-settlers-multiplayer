@@ -17,12 +17,12 @@ public class Game {
     private int turnNumber;
     private TurnPhase turnPhase;
     private final RollingDicesFactory rollingDicesFactory;
-    private final int limitMT;
+    private final int limitMT; // cardLimit before discarding
     private Coordinate robberCord;
 
 
     public Game( ) {
-        this.board = new Board();
+        this.board = new Board( );
         this.id = UUID.randomUUID( );
         this.players = new ArrayList<>( );
         this.playerFactory = new PlayerFactory( );
@@ -30,7 +30,7 @@ public class Game {
         this.rollingDicesFactory = new RollingDicesFactory( );
         this.turnPhase = TurnPhase.TRADE_AND_BUILD;
         this.limitMT = 7;
-        this.robberCord = board.getDesertCord();
+        this.robberCord = board.getDesertCord( );
     }
 
     /**
@@ -82,7 +82,7 @@ public class Game {
             List< Coordinate > coordinates = board.tokenToCoordinates( diceSum );
             for( Coordinate coordinate : coordinates ) {
 
-                if( coordinate.equals( this.robberCord )) {
+                if( coordinate.equals( this.robberCord ) ) {
                     continue; // tiles with robber can not produce cards
                 }
 
@@ -189,21 +189,58 @@ public class Game {
         return board.placeBuilding( newB , currentPlayer , false );
     }
 
+
     /**
      *
      */
-    public void discardCards( ) {
+    public void discardCardsAllPlayersRandom( ) {
         if( turnPhase != TurnPhase.DISCARD_PHASE ) {
             throw new IllegalStateException( "Wrong turnPhase" );
         }
 
-        //TODO change random to choosing
+        //TODO remove later
         for( Player player : players ) {
             if( player.hasCardsAboveLimit( limitMT ) ) {
                 player.removeRandomCardsToMatchLimit( limitMT );
             }
         }
         turnPhase = TurnPhase.ROBBER_PLACEMENT;
+    }
+
+    /**
+     *
+     */
+    public void discardCardsOnePlayer( String playerNickName , HashMap< CardType, Integer > cardsToDiscard ) {
+        if( turnPhase != TurnPhase.DISCARD_PHASE ) {
+            throw new IllegalStateException( "Wrong turnPhase" );
+        }
+        Player player = getPlayer( playerNickName );
+
+        if( player == null ) {
+            throw new IllegalArgumentException( "Player " + playerNickName + " does not exist" );
+        }
+
+        if( ! player.hasCardsAboveLimit( limitMT ) ) {
+            throw new IllegalArgumentException( "Player does not have more than " + limitMT + " cards" );
+        }
+
+        int expectedDiscardCount = player.getCardsCount( ) / 2;
+        int submittedDiscardCount = cardsToDiscard.values( ).stream( )
+                .mapToInt( Integer::intValue )
+                .sum( );
+
+        if( submittedDiscardCount != expectedDiscardCount ) {
+            throw new IllegalArgumentException( "Player must discard exactly " + expectedDiscardCount + " cards" );
+        }
+
+        player.removeCards( cardsToDiscard );
+
+        boolean anyPlayerStillNeedsToDiscard = players.stream( )
+                .anyMatch( p -> p.hasCardsAboveLimit( limitMT ) );
+
+        if( ! anyPlayerStillNeedsToDiscard ) {
+            turnPhase = TurnPhase.ROBBER_PLACEMENT;
+        }
     }
 
     /**

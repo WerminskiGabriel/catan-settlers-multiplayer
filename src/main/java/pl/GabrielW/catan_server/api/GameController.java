@@ -3,6 +3,7 @@ package pl.GabrielW.catan_server.api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.GabrielW.catan_server.api.dto.CreateGameRequest;
+import pl.GabrielW.catan_server.api.dto.DiscardRequest;
 import pl.GabrielW.catan_server.api.dto.GameRequests;
 import pl.GabrielW.catan_server.api.dto.GameStateResponse;
 import pl.GabrielW.catan_server.service.GameService;
@@ -44,8 +45,8 @@ public class GameController {
     }
 
     @PostMapping( "/{id}/discard" )
-    public ResponseEntity< GameStateResponse > discardCards( @PathVariable UUID id ) {
-        GameStateResponse response = gameService.discardCards( id );
+    public ResponseEntity< GameStateResponse > discardCards( @PathVariable UUID id, @RequestBody DiscardRequest request  ) {
+        GameStateResponse response = gameService.discardCards( id , request.playerNickName(),  request.cards() );
         return ResponseEntity.ok( response );
     }
 

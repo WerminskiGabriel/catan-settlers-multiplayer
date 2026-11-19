@@ -7,11 +7,7 @@ import pl.GabrielW.catan_server.model.Player;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTests {
 
@@ -104,11 +100,11 @@ public class GameTests {
     }
 
     @Test
-    public void discardInWrongPhaseThrows( ) {
+    public void discardAllInWrongPhaseThrows( ) {
         Game game = startGameDefault( );
         game.setTurnPhase( TurnPhase.ROLL_PHASE );
 
-        assertThrows( IllegalStateException.class , game::discardCards );
+        assertThrows( IllegalStateException.class , game::discardCardsAllPlayersRandom );
     }
 
     @Test
@@ -240,8 +236,8 @@ public class GameTests {
         game.setTurnNumber( 3 );
         game.setTurnPhase( TurnPhase.SETUP_BUILDING );
         HashSet< Coordinate > spot2 = new HashSet<>( List.of(
-                new Coordinate( -1 , 0 ) ,
-                new Coordinate( -1 , 1 ) ,
+                new Coordinate( - 1 , 0 ) ,
+                new Coordinate( - 1 , 1 ) ,
                 new Coordinate( 0 , 0 )
         ) );
 
@@ -250,10 +246,10 @@ public class GameTests {
     }
 
     @Test
-    public void validRobberPlacementAtGameStart(){
+    public void validRobberPlacementAtGameStart( ) {
         Game game = startGameDefault( );
 
-        assertTrue( game.getRobberCord( ) != null && game.getRobberCord() instanceof Coordinate );
+        assertNotNull( game.getRobberCord( ) , "robberCord can not be null" );
     }
 
 }
