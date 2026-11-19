@@ -2,10 +2,10 @@ package pl.GabrielW.catan_server.api;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.GabrielW.catan_server.api.dto.CreateGameRequest;
-import pl.GabrielW.catan_server.api.dto.DiscardRequest;
-import pl.GabrielW.catan_server.api.dto.GameRequests;
-import pl.GabrielW.catan_server.api.dto.GameStateResponse;
+import pl.GabrielW.catan_server.api.dto.request.CreateGameRequest;
+import pl.GabrielW.catan_server.api.dto.request.DiscardRequest;
+import pl.GabrielW.catan_server.api.dto.request.GameRequests;
+import pl.GabrielW.catan_server.api.dto.response.GameStateResponse;
 import pl.GabrielW.catan_server.service.GameService;
 
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public class GameController {
         this.gameService = gameService;
     }
 
-    @PostMapping( )
+    @PostMapping()
     public GameStateResponse createGame( @RequestBody CreateGameRequest request ) {
         return gameService.createGame( request.playerNickNames( ) );
     }
@@ -45,8 +45,8 @@ public class GameController {
     }
 
     @PostMapping( "/{id}/discard" )
-    public ResponseEntity< GameStateResponse > discardCards( @PathVariable UUID id, @RequestBody DiscardRequest request  ) {
-        GameStateResponse response = gameService.discardCards( id , request.playerNickName(),  request.cards() );
+    public ResponseEntity< GameStateResponse > discardCards( @PathVariable UUID id , @RequestBody DiscardRequest request ) {
+        GameStateResponse response = gameService.discardCards( id , request.playerNickName( ) , request.cards( ) );
         return ResponseEntity.ok( response );
     }
 
@@ -71,6 +71,20 @@ public class GameController {
         GameStateResponse response = gameService.buildBuilding( id , coords );
         return ResponseEntity.ok( response );
     }
+
+    @PostMapping( "/{id}/upgrade-settlement" )
+    public ResponseEntity< GameStateResponse > upgradeSettlement(
+            @PathVariable UUID id ,
+            @RequestBody GameRequests.BuildRequest request
+    ) {
+
+        HashSet< pl.GabrielW.catan_server.gameEngine.Coordinate > coords =
+                request.coordinates( ) != null ? new HashSet<>( request.coordinates( ) ) : new HashSet<>( );
+
+        GameStateResponse response = gameService.upgradeBuilding( id , coords );
+        return ResponseEntity.ok( response );
+    }
+
 
     @PostMapping( "/{id}/place-robber" )
     public ResponseEntity< GameStateResponse > placeRobber(
@@ -106,6 +120,15 @@ public class GameController {
                 otherCards ,
                 request.otherPlayerNickName( )
         );
+        return ResponseEntity.ok( response );
+    }
+
+    @PostMapping( "/{id}/bank-trade" )
+    public ResponseEntity< GameStateResponse > bankTrade(
+            @PathVariable UUID id ,
+            @RequestBody GameRequests.BankTradeRequest request
+    ) {
+        GameStateResponse response = gameService.bankTrade( id , request.give( ) , request.receive( ) );
         return ResponseEntity.ok( response );
     }
 }

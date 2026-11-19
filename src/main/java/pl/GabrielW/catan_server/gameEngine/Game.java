@@ -19,6 +19,7 @@ public class Game {
     private final RollingDicesFactory rollingDicesFactory;
     private final int limitMT; // cardLimit before discarding
     private Coordinate robberCord;
+    private int winningPointsCondition;
 
 
     public Game( ) {
@@ -31,6 +32,8 @@ public class Game {
         this.turnPhase = TurnPhase.TRADE_AND_BUILD;
         this.limitMT = 7;
         this.robberCord = board.getDesertCord( );
+        this.winningPointsCondition = 10;
+
     }
 
     /**
@@ -91,6 +94,9 @@ public class Game {
                 for( Building building : buildings ) {
                     Player player = building.getPlayer( );
                     player.addCard( cardType );
+                    if( building.isCity( ) ) {
+                        player.addCard( cardType );
+                    }
                 }
             }
             turnPhase = TurnPhase.TRADE_AND_BUILD;
@@ -155,11 +161,16 @@ public class Game {
         if( TurnPhase.SETUP_ROAD == turnPhase ) {
             boolean placed = board.placeRoad( newB , currentPlayer , true );
             if( placed ) {
+                currentPlayer.setRoadsLeft( currentPlayer.getRoadsLeft( ) - 1 );
                 turnPhase = TurnPhase.SETUP_BUILDING;
             }
             return placed;
         }
-        return board.placeRoad( newB , currentPlayer , false );
+        boolean placed = board.placeRoad( newB , currentPlayer , false );
+        if( placed ) {
+            currentPlayer.setRoadsLeft( currentPlayer.getRoadsLeft( ) - 1 );
+        }
+        return placed;
     }
 
     /**
@@ -174,6 +185,8 @@ public class Game {
         if( TurnPhase.SETUP_BUILDING == turnPhase ) {
             boolean placed = board.placeBuilding( newB , currentPlayer , true );
             if( placed ) {
+                currentPlayer.setPoints( currentPlayer.getPoints( ) + Building.points( ) );
+                currentPlayer.setBuildingsLeft( currentPlayer.getBuildingsLeft( ) - 1 );
                 turnPhase = TurnPhase.SETUP_ROAD;
                 if( turnNumber >= players.size( ) && turnNumber < 2 * players.size( ) ) {
                     for( Coordinate coord : newB ) {
@@ -186,7 +199,31 @@ public class Game {
             }
             return placed;
         }
-        return board.placeBuilding( newB , currentPlayer , false );
+        boolean placed = board.placeBuilding( newB , currentPlayer , false );
+        if( placed ) {
+            currentPlayer.setPoints( currentPlayer.getPoints( ) + Building.points( ) );
+            currentPlayer.setBuildingsLeft( currentPlayer.getBuildingsLeft( ) - 1 );
+            checkWinCondition( );
+        }
+        return placed;
+    }
+
+
+    public boolean upgradeBuilding( HashSet< Coordinate > cords ) {
+        if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
+            throw new IllegalStateException( "Wrong turnPhase" );
+        }
+        if( currentPlayer.getBuildingUpgradesLeft( ) <= 0 ) {
+            throw new IllegalStateException( "No city upgrades left" );
+        }
+        boolean upgraded = board.upgradeBuilding( cords , currentPlayer );
+        if( upgraded ) {
+            currentPlayer.setPoints( currentPlayer.getPoints( ) + 1 );
+            currentPlayer.setBuildingUpgradesLeft( currentPlayer.getBuildingUpgradesLeft( ) - 1 );
+            currentPlayer.setBuildingsLeft( currentPlayer.getBuildingsLeft( ) + 1 );
+            checkWinCondition( );
+        }
+        return upgraded;
     }
 
 
@@ -264,19 +301,7 @@ public class Game {
         if( stealFromP == null ) {
             throw new IllegalArgumentException( "Player u want to steal from does not exist: " + stealFromPlayerNickName );
         }
-        if( turnPhase != TurnPhase.STEAL_PHASE ) {
-            throw new IllegalStateException( "Wrong turnPhase" );
-        }
-
-        if( stealFromP.hasCardsAboveLimit( 0 ) ) {
-
-            CardType stolenCard = stealFromP.getRandomCard( );
-            stealFromP.removeCard( stolenCard );
-            currentPlayer.addCard( stolenCard );
-        } else {
-            //throw
-        }
-        turnPhase = TurnPhase.TRADE_AND_BUILD;
+        stealCard( stealFromP );
     }
 
     /**
@@ -287,16 +312,77 @@ public class Game {
         if( turnPhase != TurnPhase.STEAL_PHASE ) {
             throw new IllegalStateException( "Wrong turnPhase" );
         }
+        if( stealFromP.equals( currentPlayer ) ) {
+            throw new IllegalArgumentException( "Cannot steal from yourself" );
+        }
+
+        List< Building > buildingsOnRobber = board.getBuildingsAroundHex( robberCord );
+        if( ! buildingsOnRobber.isEmpty( ) ) {
+            boolean victimHasBuilding = buildingsOnRobber.stream( )
+                    .anyMatch( b -> b.getPlayer( ).equals( stealFromP ) );
+            if( ! victimHasBuilding ) {
+                throw new IllegalArgumentException( "Victim has no building adjacent to robber" );
+            }
+        }
 
         if( stealFromP.hasCardsAboveLimit( 0 ) ) {
-
             CardType stolenCard = stealFromP.getRandomCard( );
             stealFromP.removeCard( stolenCard );
             currentPlayer.addCard( stolenCard );
         } else {
-            //throw
+            throw new IllegalArgumentException( "Victim has no cards to steal" );
         }
         turnPhase = TurnPhase.TRADE_AND_BUILD;
+    }
+
+    public void bankTrade( CardType give , CardType receive ) {
+        if( turnPhase != TurnPhase.TRADE_AND_BUILD ) {
+            throw new IllegalStateException( "Wrong turnPhase" );
+        }
+        if( give == null || receive == null || give == receive ) {
+            throw new IllegalArgumentException( "Invalid trade resource types" );
+        }
+        if( give == CardType.DESERT || give == CardType.OCEAN || receive == CardType.DESERT || receive == CardType.OCEAN ) {
+            throw new IllegalArgumentException( "Cannot trade non-resource cards" );
+        }
+        int tradeRatio = getTradeRatio( give );
+        HashMap< CardType, Integer > cost = new HashMap<>( Map.of( give , tradeRatio ) );
+        if( ! currentPlayer.canAfford( cost ) ) {
+            throw new IllegalArgumentException( "Not enough cards to trade with bank" );
+        }
+        currentPlayer.removeCards( cost );
+        currentPlayer.addCard( receive );
+    }
+
+    public int getTradeRatio( Player player , CardType cardType ) {
+        int bestRatio = 4;
+        if( board.getPorts( ) == null || board.getPorts( ).isEmpty( ) ) {
+            return bestRatio;
+        }
+        for( Map.Entry< HashSet< Coordinate >, Port > entry : board.getPorts( ).entrySet( ) ) {
+            HashSet< Coordinate > vertex = entry.getKey( );
+            Port port = entry.getValue( );
+            Building building = board.findBuildingAt( vertex , player );
+            if( building != null ) {
+                if( port.getResource( ) != null && port.getResource( ).equals( cardType ) ) {
+                    return 2;
+                }
+                if( port.getResource( ) == null ) {
+                    bestRatio = Math.min( bestRatio , 3 );
+                }
+            }
+        }
+        return bestRatio;
+    }
+
+    public int getTradeRatio( CardType cardType ) {
+        return getTradeRatio( currentPlayer , cardType );
+    }
+
+    private void checkWinCondition( ) {
+        if( currentPlayer.getPoints( ) >= winningPointsCondition ) {
+            turnPhase = TurnPhase.GAME_OVER;
+        }
     }
 
 

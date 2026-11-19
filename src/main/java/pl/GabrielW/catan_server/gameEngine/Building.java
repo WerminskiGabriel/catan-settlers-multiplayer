@@ -3,7 +3,6 @@ package pl.GabrielW.catan_server.gameEngine;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.jmx.export.naming.IdentityNamingStrategy;
 import pl.GabrielW.catan_server.model.Player;
 
 import java.util.*;
@@ -14,6 +13,7 @@ import java.util.*;
 public class Building {
     private Player player;
     private HashSet< Coordinate > coordinates;
+    private boolean isCity;
 
     public Building( HashSet< Coordinate > cords , Player player ) {
         Objects.requireNonNull( cords , "Coordinates can not be null" );
@@ -34,6 +34,18 @@ public class Building {
 
         this.coordinates = cords;
         this.player = player;
+        this.isCity = false;
+    }
+
+    public void upgrade( ) {
+        if( this.isCity ) {
+            throw new IllegalStateException( "Building is already a city" );
+        }
+        this.isCity = true;
+    }
+
+    public int getPoints( ) {
+        return isCity ? 2 : 1;
     }
 
     public static HashMap< CardType, Integer > cost( ) {
@@ -42,6 +54,13 @@ public class Building {
                 CardType.WHEAT , 1 ,
                 CardType.SHEEP , 1 ,
                 CardType.BRICK , 1
+        ) );
+    }
+
+    public static HashMap< CardType, Integer > cityCost( ) {
+        return new HashMap<>( Map.of(
+                CardType.ORE , 3 ,
+                CardType.WHEAT , 2
         ) );
     }
 

@@ -1,4 +1,4 @@
-package pl.GabrielW.catan_server.api.dto;
+package pl.GabrielW.catan_server.api.dto.response;
 
 import java.util.UUID;
 

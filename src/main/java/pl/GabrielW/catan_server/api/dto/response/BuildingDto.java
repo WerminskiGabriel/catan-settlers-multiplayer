@@ -1,4 +1,4 @@
-package pl.GabrielW.catan_server.api.dto;
+package pl.GabrielW.catan_server.api.dto.response;
 
 import pl.GabrielW.catan_server.gameEngine.Building;
 import pl.GabrielW.catan_server.gameEngine.Coordinate;
@@ -19,8 +19,7 @@ public record BuildingDto(
                 building.getCoordinates( ) ,
                 player.getNickName( ) ,
                 player.getColor( ) ,
-                false //TODO
-
+                building.isCity( )
         );
     }
 

@@ -2,15 +2,13 @@ package pl.GabrielW.catan_server.service;
 
 import org.springframework.stereotype.Service;
 import pl.GabrielW.catan_server.AuthTokens;
-import pl.GabrielW.catan_server.api.dto.GameStateResponse;
-import pl.GabrielW.catan_server.api.dto.PlayerJoinGameResponse;
+import pl.GabrielW.catan_server.api.dto.response.GameStateResponse;
+import pl.GabrielW.catan_server.api.dto.response.PlayerJoinGameResponse;
 import pl.GabrielW.catan_server.gameEngine.CardType;
 import pl.GabrielW.catan_server.gameEngine.Coordinate;
 import pl.GabrielW.catan_server.gameEngine.Game;
-import pl.GabrielW.catan_server.gameEngine.PlayerFactory;
 import pl.GabrielW.catan_server.model.Player;
 
-import javax.swing.plaf.metal.MetalBorders;
 import java.util.*;
 
 @Service
@@ -97,9 +95,15 @@ public class GameService {
         return GameStateResponse.from( game );
     }
 
-    public GameStateResponse upgradeBuilding( UUID id ) {
+    public GameStateResponse upgradeBuilding( UUID id , HashSet< Coordinate > coordinates ) {
         Game game = findGameOrThrow( id );
-        //TODO
+        game.upgradeBuilding( coordinates );
+        return GameStateResponse.from( game );
+    }
+
+    public GameStateResponse bankTrade( UUID id , CardType give , CardType receive ) {
+        Game game = findGameOrThrow( id );
+        game.bankTrade( give , receive );
         return GameStateResponse.from( game );
     }
 

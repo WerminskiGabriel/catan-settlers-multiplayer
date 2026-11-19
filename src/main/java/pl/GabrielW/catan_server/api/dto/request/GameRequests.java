@@ -1,4 +1,4 @@
-package pl.GabrielW.catan_server.api.dto;
+package pl.GabrielW.catan_server.api.dto.request;
 
 import pl.GabrielW.catan_server.gameEngine.CardType;
 import pl.GabrielW.catan_server.gameEngine.Coordinate;
@@ -29,6 +29,12 @@ public final class GameRequests {
             Map< CardType, Integer > thisCards ,
             Map< CardType, Integer > otherCards ,
             String otherPlayerNickName
+    ) {
+    }
+
+    public record BankTradeRequest(
+            CardType give ,
+            CardType receive
     ) {
     }
 }

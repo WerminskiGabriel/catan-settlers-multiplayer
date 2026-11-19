@@ -13,6 +13,7 @@ public class Board {
     private HashMap< Coordinate, List< Road > > roads;
     private HashMap< Coordinate, List< Building > > buildings;
     private HashMap< Integer, List< Coordinate > > tokens;
+    private HashMap< HashSet< Coordinate >, Port > ports;
     private final ArrayList< CardType > resourcePool;
     private final ArrayList< Integer > numbersPool;
     private Coordinate desertCord;
@@ -23,29 +24,38 @@ public class Board {
         this.roads = new HashMap<>( );
         this.buildings = new HashMap<>( );
         this.tokens = new HashMap<>( );
+        this.ports = new HashMap<>( );
 
-        this.numbersPool = new ArrayList<>( List.of(
-                2 ,
-                3 , 3 ,
-                4 , 4 ,
-                5 , 5 ,
-                6 , 6 ,
-                8 , 8 ,
-                9 , 9 ,
-                10 , 10 ,
-                11 , 11 ,
-                12
-        ) );
-        this.resourcePool = new ArrayList<>( List.of(
-                CardType.WOOD , CardType.WOOD , CardType.WOOD , CardType.WOOD ,
-                CardType.SHEEP , CardType.SHEEP , CardType.SHEEP , CardType.SHEEP ,
-                CardType.WHEAT , CardType.WHEAT , CardType.WHEAT , CardType.WHEAT ,
-                CardType.BRICK , CardType.BRICK , CardType.BRICK ,
-                CardType.ORE , CardType.ORE , CardType.ORE ,
-                CardType.DESERT
-        ) );
+        this.numbersPool = new ArrayList<>( List.of( 2 , 3 , 3 , 4 , 4 , 5 , 5 , 6 , 6 , 8 , 8 , 9 , 9 , 10 , 10 , 11 , 11 , 12 ) );
+        this.resourcePool = new ArrayList<>( List.of( CardType.WOOD , CardType.WOOD , CardType.WOOD , CardType.WOOD , CardType.SHEEP , CardType.SHEEP , CardType.SHEEP , CardType.SHEEP , CardType.WHEAT , CardType.WHEAT , CardType.WHEAT , CardType.WHEAT , CardType.BRICK , CardType.BRICK , CardType.BRICK , CardType.ORE , CardType.ORE , CardType.ORE , CardType.DESERT ) );
         this.cells = generateFullBoard( radius );
+        initPorts( );
 
+    }
+
+    private void initPorts( ) { //TODO algorithmic way of setting ports
+        addPortPair( new HashSet<>( Set.of( new Coordinate( - 2 , 0 ) , new Coordinate( - 3 , 0 ) , new Coordinate( - 3 , 1 ) ) ) , new HashSet<>( Set.of( new Coordinate( - 2 , 0 ) , new Coordinate( - 2 , - 1 ) , new Coordinate( - 3 , 0 ) ) ) , new Port( PortType.GENERIC_3 ) );
+        addPortPair( new HashSet<>( Set.of( new Coordinate( - 1 , - 1 ) , new Coordinate( - 1 , - 2 ) , new Coordinate( - 2 , - 1 ) ) ) , new HashSet<>( Set.of( new Coordinate( - 1 , - 1 ) , new Coordinate( 0 , - 2 ) , new Coordinate( - 1 , - 2 ) ) ) , new Port( PortType.WHEAT_2 ) );
+        addPortPair( new HashSet<>( Set.of( new Coordinate( 1 , - 3 ) , new Coordinate( 0 , - 2 ) , new Coordinate( 1 , - 2 ) ) ) , new HashSet<>( Set.of( new Coordinate( 2 , - 3 ) , new Coordinate( 1 , - 3 ) , new Coordinate( 1 , - 2 ) ) ) , new Port( PortType.ORE_2 ) );
+        addPortPair( new HashSet<>( Set.of( new Coordinate( 2 , - 3 ) , new Coordinate( 2 , - 2 ) , new Coordinate( 3 , - 3 ) ) ) , new HashSet<>( Set.of( new Coordinate( 2 , - 2 ) , new Coordinate( 3 , - 3 ) , new Coordinate( 3 , - 2 ) ) ) , new Port( PortType.GENERIC_3 ) );
+        addPortPair( new HashSet<>( Set.of( new Coordinate( 2 , - 1 ) , new Coordinate( 3 , - 2 ) , new Coordinate( 3 , - 1 ) ) ) , new HashSet<>( Set.of( new Coordinate( 2 , - 1 ) , new Coordinate( 2 , 0 ) , new Coordinate( 3 , - 1 ) ) ) , new Port( PortType.SHEEP_2 ) );
+        addPortPair( new HashSet<>( Set.of( new Coordinate( 1 , 1 ) , new Coordinate( 2 , 0 ) , new Coordinate( 2 , 1 ) ) ) , new HashSet<>( Set.of( new Coordinate( 1 , 1 ) , new Coordinate( 1 , 2 ) , new Coordinate( 2 , 1 ) ) ) , new Port( PortType.GENERIC_3 ) );
+        addPortPair( new HashSet<>( Set.of( new Coordinate( 1 , 2 ) , new Coordinate( 0 , 2 ) , new Coordinate( 0 , 3 ) ) ) , new HashSet<>( Set.of( new Coordinate( 0 , 2 ) , new Coordinate( 0 , 3 ) , new Coordinate( - 1 , 3 ) ) ) , new Port( PortType.GENERIC_3 ) );
+        addPortPair( new HashSet<>( Set.of( new Coordinate( - 1 , 3 ) , new Coordinate( - 1 , 2 ) , new Coordinate( - 2 , 3 ) ) ) , new HashSet<>( Set.of( new Coordinate( - 2 , 2 ) , new Coordinate( - 2 , 3 ) , new Coordinate( - 1 , 2 ) ) ) , new Port( PortType.BRICK_2_ ) );
+        addPortPair( new HashSet<>( Set.of( new Coordinate( - 3 , 2 ) , new Coordinate( - 2 , 1 ) , new Coordinate( - 2 , 2 ) ) ) , new HashSet<>( Set.of( new Coordinate( - 3 , 2 ) , new Coordinate( - 2 , 1 ) , new Coordinate( - 3 , 1 ) ) ) , new Port( PortType.WOOD_2 ) );
+    }
+
+    private void addPortPair( HashSet< Coordinate > v1 , HashSet< Coordinate > v2 , Port port ) {
+        ports.put( v1 , port );
+        ports.put( v2 , port );
+    }
+
+    public void addPort( HashSet< Coordinate > vertex , Port port ) {
+        ports.put( vertex , port );
+    }
+
+    public Port getPort( HashSet< Coordinate > vertex ) {
+        return ports.get( vertex );
     }
 
     private HashMap generateFullBoard( int realRadius ) {
@@ -147,14 +157,9 @@ public class Board {
                     continue;
                 }
 
-                Coordinate unsharedOld = cords.stream( )
-                        .filter( c -> ! c.equals( coordinate ) )
-                        .findFirst( ).orElseThrow( );
+                Coordinate unsharedOld = cords.stream( ).filter( c -> ! c.equals( coordinate ) ).findFirst( ).orElseThrow( );
 
-                Coordinate unsharedNew = road.getCoordinates( ).stream( )
-                        .filter( c -> ! c.equals( coordinate ) )
-                        .findFirst( )
-                        .orElseThrow( );
+                Coordinate unsharedNew = road.getCoordinates( ).stream( ).filter( c -> ! c.equals( coordinate ) ).findFirst( ).orElseThrow( );
 
                 if( isNeighbour( unsharedNew , unsharedOld ) ) {
 
@@ -252,6 +257,45 @@ public class Board {
         }
 
         return true;
+    }
+
+    public Building findBuildingAt( HashSet< Coordinate > cords , Player player ) {
+        for( Coordinate coordinate : cords ) {
+            List< Building > buildingList = coordinateToBuildings( coordinate );
+            for( Building building : buildingList ) {
+                if( building.getCoordinates( ).equals( cords ) && building.getPlayer( ).equals( player ) ) {
+                    return building;
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean upgradeBuilding( HashSet< Coordinate > cords , Player player ) {
+        Building building = findBuildingAt( cords , player );
+        if( building == null ) {
+            throw new IllegalArgumentException( "No building found at this location for player" );
+        }
+        if( building.isCity( ) ) {
+            throw new IllegalStateException( "Building is already a city" );
+        }
+        if( ! player.CanAffordCards( Building.cityCost( ) ) ) {
+            return false;
+        }
+        player.removeCards( Building.cityCost( ) );
+        building.upgrade( );
+        return true;
+    }
+
+    public List< Building > getBuildingsAroundHex( Coordinate hexCoord ) {
+        List< Building > result = new ArrayList<>( );
+        List< Building > buildingsAtHex = coordinateToBuildings( hexCoord );
+        for( Building building : buildingsAtHex ) {
+            if( ! result.contains( building ) ) {
+                result.add( building );
+            }
+        }
+        return result;
     }
 
     public boolean canAffordRoad( Player player ) {
