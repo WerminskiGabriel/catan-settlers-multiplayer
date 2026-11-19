@@ -15,7 +15,7 @@ public class Board {
     private HashMap< Integer, List< Coordinate > > tokens;
     private final ArrayList< CardType > resourcePool;
     private final ArrayList< Integer > numbersPool;
-
+    private Coordinate desertCord;
 
     public Board( ) {
         this.radius = 2;
@@ -50,6 +50,8 @@ public class Board {
 
     private HashMap generateFullBoard( int realRadius ) {
 
+        Coordinate robberCord;
+
         int radius = realRadius + 1;
 
         Collections.shuffle( this.resourcePool );
@@ -81,6 +83,9 @@ public class Board {
                 int token = ( resource == CardType.DESERT || resource == CardType.OCEAN ) ? 0 : this.numbersPool.get( numbersIdx++ );
 
                 cells.put( curr_cord , new Cell( resource , token ) );
+                if( resource == CardType.DESERT ) {
+                    this.desertCord = curr_cord;
+                }
                 if( token != 0 ) {
                     tokens.computeIfAbsent( token , k -> new ArrayList<>( ) ).add( curr_cord );
                 }

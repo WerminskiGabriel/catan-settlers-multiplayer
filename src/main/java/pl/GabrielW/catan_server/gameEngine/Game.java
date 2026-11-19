@@ -22,7 +22,7 @@ public class Game {
 
 
     public Game( ) {
-        this.board = new Board( );
+        this.board = new Board();
         this.id = UUID.randomUUID( );
         this.players = new ArrayList<>( );
         this.playerFactory = new PlayerFactory( );
@@ -30,6 +30,7 @@ public class Game {
         this.rollingDicesFactory = new RollingDicesFactory( );
         this.turnPhase = TurnPhase.TRADE_AND_BUILD;
         this.limitMT = 7;
+        this.robberCord = board.getDesertCord();
     }
 
     /**
@@ -80,6 +81,11 @@ public class Game {
 
             List< Coordinate > coordinates = board.tokenToCoordinates( diceSum );
             for( Coordinate coordinate : coordinates ) {
+
+                if( coordinate.equals( this.robberCord )) {
+                    continue; // tiles with robber can not produce cards
+                }
+
                 CardType cardType = board.coordinateToCardTypes( coordinate );
                 List< Building > buildings = board.coordinateToBuildings( coordinate );
                 for( Building building : buildings ) {

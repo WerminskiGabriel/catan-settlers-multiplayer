@@ -1,5 +1,6 @@
 package pl.GabrielW.catan_server.gameEngine;
 
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.jupiter.api.Test;
 import pl.GabrielW.catan_server.model.Player;
 
@@ -247,4 +248,12 @@ public class GameTests {
         game.buildBuilding( spot2 );
         assertTrue( p1.getCardsCount( ) > 0 , "Second settlement in setup must grant starting resources from adjacent hexes" );
     }
+
+    @Test
+    public void validRobberPlacementAtGameStart(){
+        Game game = startGameDefault( );
+
+        assertTrue( game.getRobberCord( ) != null && game.getRobberCord() instanceof Coordinate );
+    }
+
 }
